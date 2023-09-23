@@ -75,10 +75,12 @@ while ((x_right-x_left) > tol*d) && (i < i_max)  && (abs(f_x) > tol)
         x_left = x;
     end
 end
-fprintf("x encontrado = %f\n", x)
+fprintf("x encontrado = %f m\n", x)
 fprintf("k_x encontrado = %f\n", x/d)
 M_d_max = (Rcc(x,sigma_cd,b,d,x_lim,n,epslon_c2,epslon_cu)*d - Rcca(x,sigma_cd,b,d,x_lim,n,epslon_c2,epslon_cu) + Rsc(x,d,d_c,f_yd,epslon_c2,epslon_cu,epslon_yd,A_sc)*(d-d_c));
-fprintf("M_d_max = %f\n", M_d_max) %sse ja eh o majorado, precisa dividir por 1.4
+fprintf("M_d_max = %f kN.m\n", M_d_max*1e3) %sse ja eh o majorado, precisa dividir por 1.4
+fprintf("M_k_max = %f kN.m\n", M_d_max*1e3/1.4) %sse ja eh o majorado, precisa dividir por 1.4
+
 if (M_d_max - M_d > tol*M_d_max)
     fprintf("Verificacao OK!\n")
 else
