@@ -24,11 +24,16 @@ cost_s = 5.50*gamma_aco; %R$/m3
 c = 0.02; %m
 b = 0.20; %m
 h = 0.50; %m
-phi = 0.016; %m
+phi = 0.0; %m
 M_d = 180000*1e-6*1.4; %MN*m #Majorar esforços
-% diametros = [0.0125, 0.016, 0.020, 0.025, 0.032]; %m
+diametros = [0.0125, 0.016, 0.020, 0.025, 0.032]; %m
 heights = linspace(2*c+phi,2,1e3+1);
+
+Final_result = zeros(8,length(diametros)); %phi, h, k_x, A_st, A_s, C, N, B
 infos = zeros(5,length(heights)); %h, k_x,A_st,A_s,C
+for j=1:length(diametros)
+    phi = diametros(j);
+    Final_result(1,j)=phi;
 for index=1:(length(heights))
     fprintf("Iteracao %d\n", index)
     h = heights(index);
@@ -98,20 +103,29 @@ for index=1:(length(heights))
 end
 
 %% Plotando os custos
-plot(infos(1,(infos(5,:)>0))*100,infos(5,(infos(5,:)>0)),"-r", "LineWidth", 2)
+hold on
+plot(infos(1,(infos(5,:)>0))*100,infos(5,(infos(5,:)>0)),"-", "LineWidth", 1)
 set(gca, 'FontSize', 12);
 set(gca, 'TickLabelInterpreter', 'latex');
-print -depsc2 images/q4.eps
-title("Diensionamento de custo por m da viga", 'FontSize',14,'Interpreter','latex')
+title("Dimensionamento de custo por m da viga", 'FontSize',14,'Interpreter','latex')
 xlabel("h (cm)", 'FontSize',14,'Interpreter','latex')
 ylabel("Custo (R\$/m)", 'FontSize',14,'Interpreter','latex')
+legend({'phi = 12.5','phi = 16','phi = 20', 'phi = 25', 'phi = 32'}, 'FontSize',14,'Interpreter','latex','Location','northwest')
+% label = sprintf('phi = %.1f',phi*1000);
+% filename = sprintf('images/q4_phi_%d.eps',phi*10000);
+% legend(label, 'FontSize',14,'Interpreter','latex','Location','northwest')
 xlim([0,200])
+% print('-depsc2',filename)
+print -depsc2 images/q4_all.eps
 
 [cost_min,index] = min(infos(5,(infos(5,:)>0)));
 fprintf("---------------------------------\n")
 fprintf("Custo minimo (R$/m) = %f\n", cost_min)
 index=length(infos(1,:))-length(infos(5,infos(5,:)>0))+index;
-
+Final_result(2:6,j) = infos(:,index);
+Final_result(7,j) = infos(4,index)/(pi*phi*phi/4);
+Final_result(8,j) = 2*c+phi*(2*Final_result(7,j)-1);
+end
 
 %% Calculo de R_cc
 function R_cc = Rcc(x,sigma_cd,b,d,x_lim,n,epslon_c2,epslon_cu) % output -> MN
