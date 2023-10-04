@@ -58,8 +58,8 @@ end
 
 y_t=h/2;
 y_b=-h/2;
-%plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
-%plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb)
+plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
+plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb)
 
 %% Testando um valor especifico
 epsilon_0 = 0.5;
@@ -95,6 +95,32 @@ else
     end
 end
 end
+
+function I_0 = I0(epsilon, epsilon_c2, sigma_cd,n)
+    if epsilon < 0
+        I_0 = 0;
+    else
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
+        I_0 = sigma_cd*(epsilon - epsilon_c2*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1));
+    else
+        I_0 = sigma_cd*(epsilon - epsilon_c2/(n + 1));
+    end
+    end
+end
+
+function I_1 = I1(epsilon, epsilon_c2, sigma_cd,n)
+    if epsilon < 0
+        I_1 = 0;
+    else
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
+        I_1 = sigma_cd*(power(epsilon,2)/2 + power(epsilon_c2,2)*(-1*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1) + 1*(1 - power(1 - epsilon/epsilon_c2,n + 2))/(n + 2)));
+
+    else
+        I_1 = sigma_cd*(power(epsilon,2)/2 - power(epsilon_c2,2)/((n + 1)*(n + 2)));
+    end
+    end
+end
+
 
 function plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
 c = epsilon_c2;
@@ -132,7 +158,7 @@ E = [(u+10)/(y_b-max(y_s));u-y_b*((u+10)/(y_b-max(y_s)))];
 F = [-u/h;-u*y_b/h];
 points = [A B C D E F A];
 % Number of points you want to generate
-num_points = 10;
+num_points = 100;
 kappa_values = [];
 epsilon_0_values = [];
 for i=1:6
@@ -144,7 +170,7 @@ N_r_values = zeros(1,length(kappa_values));
 M_r_values = zeros(1,length(epsilon_0_values));
 
 for j=1:length(kappa_values)
-    fprintf("Iteracao %d\n",j)
+    % fprintf("Iteracao %d\n",j)
     N_c = Nc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h);
     M_c = Mc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b);
     A_si = pi*phi*phi*nb/4;
@@ -180,6 +206,16 @@ function DI_m = DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,m)
 DI_m = Im(epsilon_t, epsilon_c2, sigma_cd,n,m)-Im(epsilon_b, epsilon_c2, sigma_cd,n,m);
 end
 
+function DI_0 = DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)
+DI_0 = I0(epsilon_t, epsilon_c2, sigma_cd,n)-I0(epsilon_b, epsilon_c2, sigma_cd,n);
+end
+
+
+function DI_1 = DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)
+DI_1 = I1(epsilon_t, epsilon_c2, sigma_cd,n)-I1(epsilon_b, epsilon_c2, sigma_cd,n);
+end
+
+
 function N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h)
 tol = 1e-10;
 if abs(k) < tol
@@ -187,7 +223,7 @@ if abs(k) < tol
 else
     epsilon_b = epsilon_0 + y_b*k;
     epsilon_t = epsilon_0 + y_t*k;
-    N_c = b* DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,0)/k;
+    N_c = b* DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)/k;
 end
 end
 
@@ -199,7 +235,7 @@ if abs(k) < tol
 else
     epsilon_b = epsilon_0 + y_b*k;
     epsilon_t = epsilon_0 + y_t*k;
-    M_c = b* (DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,1)-epsilon_0*DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,0))/power(k,2);
+    M_c = b* (DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)-epsilon_0*DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
 end
 end
 
@@ -229,6 +265,7 @@ end
 end
 
 function s = S(b,y_b,y_t)
-syms y
-s = double(b*int(y,y,y_b,y_t));
+% syms y
+% s = double(b*int(y,y,y_b,y_t));
+s = (power(y_t,2)-power(y_b,2))/2; %secao retangular
 end
