@@ -76,7 +76,7 @@ N_r = double(N_c + N_s)
 M_r = double(M_c + M_s)
 
 
-
+%% Funcoes de plot
 
 function plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
 c = epsilon_c2;
@@ -240,10 +240,10 @@ end
 
 
 function sigma_c = sigmac(epsilon,epsilon_c2,sigma_cd,n)
-if epsilon <= 0
+if epsilon < 0
     sigma_c = 0;
 else
-    if (0 < epsilon) && (epsilon <= epsilon_c2)
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
         sigma_c = sigma_cd*(1-power(1-epsilon/epsilon_c2,n));
     else
         sigma_c = sigma_cd;
@@ -292,7 +292,11 @@ end
 
 %% Calculo da Matriz Jacobiana
 
-function J_s = Js(epsilon_s,f_yd,epsilon_yd,y_s,A_si)
+function J_s = Js(f_yd,epsilon_yd,y_s,nb,epsilon_0,k)
+
+A_si = pi*phi*phi*nb/4;
+epsilon_s = epsilon_0 + y_s*k;
+
 J_s = zeros(2);
 for i=1:length(A_si)
 if (epsilon_s(i) < -epsilon_yd)
@@ -308,6 +312,41 @@ J_s = J_s - D_si*A_si(i)*[1 , y_s(i); y_s(i) , power(y_s(i),2)];
 end
 end
 
+
+function J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k)
+
+J_c = zeros(2);
+J_c(1,1)=-b*DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,0)/k;
+J_c(1,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
+J_c(2,1)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
+J_c(2,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,2)-2*(DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)-epsilon_0*DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)))/power(k,3);
+
+end
+
+%% Verificacao do ELU
+
+function ELU(epsilon_0,k,y_b,y_t,y_s,epsilon_c2,epsilon_cu)
+
+epsilon_b = epsilon_0 + y_b*k;
+epsilon_t = epsilon_0 + y_t*k;
+epsilon_s = epsilon_0 + y_s*k;
+epsilon_max = max(epsilon_b,epsilon_t);
+epsilon_min = min(epsilon_b,epsilon_t);
+epsilon_s_min = min(epsilon_s);
+
+if epsilon_max > epsilon_cu
+    fprintf("ELU ultrapassado: polo epsilon_cu!\n")
+end
+if epsilon_s_min < -10
+    fprintf("ELU ultrapassado: polo epsilon_s!\n")
+end
+if epsilon_max - (epsilon_cu-epsilon_c2)*(epsilon_max-epsilon_min)/epsilon_cu > epsilon_c2
+    fprintf("ELU ultrapassado: polo epsilon_c2!\n")
+end
+if (epsilon_max <= epsilon_cu) && (epsilon_s_min >= -10) && (epsilon_max - (epsilon_cu-epsilon_c2)*(epsilon_max-epsilon_min)/epsilon_cu <= epsilon_c2)
+    fprintf("ELU ok!\n")
+end
+end
 
 %% Calculo do momento estatico
 
