@@ -1,5 +1,6 @@
 %% Nova Flexao Normal Composta
 
+
 % Limpando variaveis
 clear all
 close all
@@ -65,61 +66,16 @@ plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,ph
 epsilon_0 = 0.5;
 k = 9.375;
 
-A_si = pi*phi*phi*nb/4;
-epsilon_s = epsilon_0 + y_s*k;
-N_si = zeros(1,length(y_s));
-M_si = zeros(1,length(y_s));
-for i=1:length(y_s)
-    N_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd);
-    M_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd)*y_s(i);
-end
 
-N_s = sum(N_si);
-M_s = sum(M_si);
+N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+
 N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h);
 M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b);
 N_r = double(N_c + N_s)
 M_r = double(M_c + M_s)
 
-function I_m = Im(epsilon, epsilon_c2, sigma_cd,n,m)
-syms csi
-if epsilon <= 0
-    I_m = 0;
-else
-    if (0 < epsilon) && (epsilon <= epsilon_c2)
-        I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon);
-    else
-        if epsilon > epsilon_c2
-            I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon_c2) + sigma_cd*int(power(csi,m),csi,epsilon_c2,epsilon);
-        end
-    end
-end
-end
 
-function I_0 = I0(epsilon, epsilon_c2, sigma_cd,n)
-    if epsilon < 0
-        I_0 = 0;
-    else
-    if (0 <= epsilon) && (epsilon <= epsilon_c2)
-        I_0 = sigma_cd*(epsilon - epsilon_c2*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1));
-    else
-        I_0 = sigma_cd*(epsilon - epsilon_c2/(n + 1));
-    end
-    end
-end
-
-function I_1 = I1(epsilon, epsilon_c2, sigma_cd,n)
-    if epsilon < 0
-        I_1 = 0;
-    else
-    if (0 <= epsilon) && (epsilon <= epsilon_c2)
-        I_1 = sigma_cd*(power(epsilon,2)/2 + power(epsilon_c2,2)*(-1*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1) + 1*(1 - power(1 - epsilon/epsilon_c2,n + 2))/(n + 2)));
-
-    else
-        I_1 = sigma_cd*(power(epsilon,2)/2 - power(epsilon_c2,2)/((n + 1)*(n + 2)));
-    end
-    end
-end
 
 
 function plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
@@ -173,16 +129,8 @@ for j=1:length(kappa_values)
     % fprintf("Iteracao %d\n",j)
     N_c = Nc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h);
     M_c = Mc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b);
-    A_si = pi*phi*phi*nb/4;
-    epsilon_s = epsilon_0_values(j) + y_s*kappa_values(j);
-    N_si = zeros(1,length(y_s));
-    M_si = zeros(1,length(y_s));
-    for i=1:length(y_s)
-        N_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd);
-        M_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd)*y_s(i);
-    end
-    N_s = sum(N_si);
-    M_s = sum(M_si);
+    N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0_values(j),kappa_values(j));
+    M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0_values(j),kappa_values(j));
     N_r_values(j) = (N_c + N_s)*1e3;
     M_r_values(j) = (M_c + M_s)*1e3;
 end
@@ -202,6 +150,48 @@ set(gca, 'TickLabelInterpreter', 'latex');
 
 end
 
+%% Funcoes potencial
+
+function I_m = Im(epsilon, epsilon_c2, sigma_cd,n,m)
+syms csi
+if epsilon <= 0
+    I_m = 0;
+else
+    if (0 < epsilon) && (epsilon <= epsilon_c2)
+        I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon);
+    else
+        if epsilon > epsilon_c2
+            I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon_c2) + sigma_cd*int(power(csi,m),csi,epsilon_c2,epsilon);
+        end
+    end
+end
+end
+
+function I_0 = I0(epsilon, epsilon_c2, sigma_cd,n)
+    if epsilon < 0
+        I_0 = 0;
+    else
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
+        I_0 = sigma_cd*(epsilon - epsilon_c2*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1));
+    else
+        I_0 = sigma_cd*(epsilon - epsilon_c2/(n + 1));
+    end
+    end
+end
+
+function I_1 = I1(epsilon, epsilon_c2, sigma_cd,n)
+    if epsilon < 0
+        I_1 = 0;
+    else
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
+        I_1 = sigma_cd*(power(epsilon,2)/2 + power(epsilon_c2,2)*(-1*(1 - power(1 - epsilon/epsilon_c2,n + 1))/(n + 1) + 1*(1 - power(1 - epsilon/epsilon_c2,n + 2))/(n + 2)));
+
+    else
+        I_1 = sigma_cd*(power(epsilon,2)/2 - power(epsilon_c2,2)/((n + 1)*(n + 2)));
+    end
+    end
+end
+
 function DI_m = DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,m)
 DI_m = Im(epsilon_t, epsilon_c2, sigma_cd,n,m)-Im(epsilon_b, epsilon_c2, sigma_cd,n,m);
 end
@@ -215,6 +205,15 @@ function DI_1 = DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)
 DI_1 = I1(epsilon_t, epsilon_c2, sigma_cd,n)-I1(epsilon_b, epsilon_c2, sigma_cd,n);
 end
 
+function DJ_m = DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,m)
+DJ_m = Jm(epsilon_t, epsilon_0, epsilon_c2, sigma_cd,n,m)-Jm(epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,m);
+end
+
+function J_m = Jm(epsilon, epsilon_0, epsilon_c2,sigma_cd,n,m)
+J_m = sigmac(epsilon,epsilon_c2,sigma_cd,n)*power(epsilon-epsilon_0,m);
+end
+
+%% Esforco do concreto
 
 function N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h)
 tol = 1e-10;
@@ -252,6 +251,32 @@ else
 end
 end
 
+%% Esforco do aco
+
+function N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k)
+
+A_si = pi*phi*phi*nb/4;
+epsilon_s = epsilon_0 + y_s*k;
+N_si = zeros(1,length(y_s));
+for i=1:length(y_s)
+    N_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd);
+end
+
+N_s = sum(N_si);
+end
+
+function M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k)
+
+A_si = pi*phi*phi*nb/4;
+epsilon_s = epsilon_0 + y_s*k;
+M_si = zeros(1,length(y_s));
+for i=1:length(y_s)
+    M_si(i) = A_si(i)*sigmas(epsilon_s(i),f_yd,epsilon_yd)*y_s(i);
+end
+
+M_s = sum(M_si);
+end
+
 function sigma_s = sigmas(epsilon_s,f_yd,epsilon_yd)
 if (epsilon_s < -epsilon_yd)
     sigma_s = -f_yd;
@@ -263,6 +288,28 @@ else
     end
 end
 end
+
+
+%% Calculo da Matriz Jacobiana
+
+function J_s = Js(epsilon_s,f_yd,epsilon_yd,y_s,A_si)
+J_s = zeros(2);
+for i=1:length(A_si)
+if (epsilon_s(i) < -epsilon_yd)
+    D_si = 0;
+else
+    if (-epsilon_yd < epsilon_s(i)) && (epsilon_s(i) < epsilon_yd)
+        D_si = f_yd/epsilon_yd;
+    else
+        D_si = 0;
+    end
+end
+J_s = J_s - D_si*A_si(i)*[1 , y_s(i); y_s(i) , power(y_s(i),2)];
+end
+end
+
+
+%% Calculo do momento estatico
 
 function s = S(b,y_b,y_t)
 % syms y
