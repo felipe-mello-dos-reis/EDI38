@@ -31,6 +31,10 @@ nb = [2 2 2];
 phi = 0.010; % m
 y_s = linspace(-(h/2-d),(h/2-d),nc)
 % M_d = 110000*1e-6*1.4; %MN*m #Majorar esforços
+% N_d = 0.8160;
+% M_d = 0.0373;
+N_d = 0.8160;
+M_d = -0.0560;
 
 
 epsilon_c2 = 0; % por mil
@@ -38,7 +42,13 @@ epsilon_cu = 0; % por mil
 x_lim = 0;
 n = 0;
 
-tol = 1e-9;
+% Tolerancias
+
+tol_J = 1e-9;
+tol_k = 1e-9;
+tol_f = 1e-9;
+i = 0;
+it_max = 1e6;
 
 % Especificacoes do problema
 if fck <= 50
@@ -59,26 +69,88 @@ end
 
 y_t=h/2;
 y_b=-h/2;
-plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
-plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb)
+% plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
+% plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb,tol_k)
 
 %% Testando um valor especifico
-epsilon_0 = 0.5;
-k = 9.375;
+epsilon_0 = 2;
+k = 0;
 
 
 N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
 M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
 
-N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h);
-M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b);
-N_r = double(N_c + N_s)
-M_r = double(M_c + M_s)
+N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+% N_r = double(N_c + N_s)
+% M_r = double(M_c + M_s)
+% I_0_epsilon_0 = I0(epsilon_0, epsilon_c2, sigma_cd,n)
+% I_1_epsilon_0 = I1(epsilon_0, epsilon_c2, sigma_cd,n)
+
+epsilon_t = epsilon_0 + y_t*k;
+epsilon_b =  epsilon_0 + y_b*k;
+% J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k,h,tol_k)
+
+
+%% Metodo de Newton Raphson
+
+epsilon_0 = 0;
+k = 0;
+epsilon_0_it = epsilon_0;
+k_it = k;
+
+N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+
+N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+
+N_r = double(N_c + N_s);
+M_r = double(M_c + M_s);
+
+% Norma euclidiana admensionalizada
+f_ad = sqrt(power((N_d-N_r)/(sigma_cd*b*h),2)+power((M_d-M_r)/(sigma_cd*b*h*h),2));
+while (abs(f_ad) > tol_f) && (i < it_max)
+    i = i + 1;
+    epsilon_t = epsilon_0 + k*y_t;
+    epsilon_b = epsilon_0 + k*y_b;
+    
+    N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+    M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
+
+    N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+    M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+    
+    N_r = double(N_c + N_s);
+    M_r = double(M_c + M_s);
+ 
+    J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k,h,tol_k);
+    J_s = Js(E_s,epsilon_yd,phi,y_s,nb,epsilon_0,k);
+    J = J_c + J_s; % J = -[EA ES; ES EI]
+    J_ad = J(1,1)*J(2,2)/(sigma_cd*b*h*sigma_cd*b*h*power(h,2)) - (J(1,2)*J(2,1))/power(sigma_cd*b*h*h,2);
+    if abs(J_ad) > tol_J
+        J_inv = power(J(1,1)*J(2,2)-J(1,2)*J(2,1),-1)*[J(2,2), -J(2,1); -J(1,2), J(1,1)];
+        f = [N_d - N_r; M_d - M_r];
+        new_it = [epsilon_0; k] - J_inv*f;
+        epsilon_0 = new_it(1);
+        epsilon_0_it = [epsilon_0_it, epsilon_0];
+        k = new_it(2);
+        k_it = [k_it, k];
+        f_ad = sqrt(power((N_d-N_r)/(sigma_cd*b*h),2)+power((M_d-M_r)/(sigma_cd*b*h*h),2));
+    else
+        fprintf("Nao existe solucao!\n")
+        break
+    end
+end
+ELU(epsilon_0,k,y_b,y_t,y_s,epsilon_c2,epsilon_cu)
+
+plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s,epsilon_0_it,k_it)
+plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb,tol_k)
 
 
 %% Funcoes de plot
 
-function plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s)
+function plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s,epsilon_0_it,k_it)
 c = epsilon_c2;
 u = epsilon_cu;
 A = [0;c];
@@ -101,9 +173,13 @@ xlim(1.1*[min(points(1,:)) max(points(1,:))])
 ylim(1.1*[min(points(2,:)) max(points(2,:))])
 title('Regiao viavel para o dimensionamento', Interpreter='latex')
 
+hold on
+plot(k_it,epsilon_0_it,'-rx')
+% plot(5.9858,0.9027, 'gx')
+hold off
 end
 
-function plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb)
+function plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb,tol_k)
 c = epsilon_c2;
 u = epsilon_cu;
 A = [0;c];
@@ -127,8 +203,8 @@ M_r_values = zeros(1,length(epsilon_0_values));
 
 for j=1:length(kappa_values)
     % fprintf("Iteracao %d\n",j)
-    N_c = Nc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h);
-    M_c = Mc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b);
+    N_c = Nc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
+    M_c = Mc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
     N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0_values(j),kappa_values(j));
     M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0_values(j),kappa_values(j));
     N_r_values(j) = (N_c + N_s)*1e3;
@@ -213,11 +289,34 @@ function J_m = Jm(epsilon, epsilon_0, epsilon_c2,sigma_cd,n,m)
 J_m = sigmac(epsilon,epsilon_c2,sigma_cd,n)*power(epsilon-epsilon_0,m);
 end
 
+function D_c = Dc(epsilon, epsilon_c2,sigma_cd,n)
+if epsilon < 0
+    D_c = 0;
+else
+    if (0 <= epsilon) && (epsilon <= epsilon_c2)
+        D_c = sigma_cd*n*power(1-epsilon/epsilon_c2,n-1)/epsilon_c2;
+    else
+        D_c = 0;
+    end
+end
+end
+
+function D_s = Ds(epsilon_s,f_yd,epsilon_yd)
+if (epsilon_s < -epsilon_yd)
+    D_s = 0;
+else
+    if (-epsilon_yd < epsilon_s) && (epsilon_s < epsilon_yd)
+        D_s = f_yd/epsilon_yd; %% ? pode estar errado
+    else
+        D_s = 0;
+    end
+end
+end
+
 %% Esforco do concreto
 
-function N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h)
-tol = 1e-10;
-if abs(k) < tol
+function N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k)
+if abs(k*h) < tol_k
     N_c = sigmac(epsilon_0,epsilon_c2,sigma_cd,n)*b*h;
 else
     epsilon_b = epsilon_0 + y_b*k;
@@ -227,9 +326,8 @@ end
 end
 
 
-function M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b)
-tol = 1e-10;
-if abs(k) < tol
+function M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k)
+if abs(k*h) < tol_k
     M_c = sigmac(epsilon_0,epsilon_c2,sigma_cd,n)*S(b,y_b,y_t);
 else
     epsilon_b = epsilon_0 + y_b*k;
@@ -292,7 +390,7 @@ end
 
 %% Calculo da Matriz Jacobiana
 
-function J_s = Js(f_yd,epsilon_yd,y_s,nb,epsilon_0,k)
+function J_s = Js(E_s,epsilon_yd,phi,y_s,nb,epsilon_0,k)
 
 A_si = pi*phi*phi*nb/4;
 epsilon_s = epsilon_0 + y_s*k;
@@ -302,8 +400,8 @@ for i=1:length(A_si)
 if (epsilon_s(i) < -epsilon_yd)
     D_si = 0;
 else
-    if (-epsilon_yd < epsilon_s(i)) && (epsilon_s(i) < epsilon_yd)
-        D_si = f_yd/epsilon_yd;
+    if (-epsilon_yd <= epsilon_s(i)) && (epsilon_s(i) <= epsilon_yd)
+        D_si = E_s*1000; %1000;
     else
         D_si = 0;
     end
@@ -313,14 +411,19 @@ end
 end
 
 
-function J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k)
-
+function J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k,h,tol_k)
 J_c = zeros(2);
-J_c(1,1)=-b*DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,0)/k;
-J_c(1,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
-J_c(2,1)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
-J_c(2,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,2)-2*(DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)-epsilon_0*DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)))/power(k,3);
-
+if abs(k*h) < tol_k
+    J_c(1,1) = -Dc(epsilon_0, epsilon_c2,sigma_cd,n)*b*h;
+    J_c(1,2) = 0;
+    J_c(2,1) = 0;
+    J_c(2,2) = -Dc(epsilon_0, epsilon_c2,sigma_cd,n)*b*power(h,3)/12;
+else
+    J_c(1,1)=-b*DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,0)/k;
+    J_c(1,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
+    J_c(2,1)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,1)-DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n))/power(k,2);
+    J_c(2,2)=-b*(DJm(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,2)-2*(DI1(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)-epsilon_0*DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)))/power(k,3);
+end
 end
 
 %% Verificacao do ELU
