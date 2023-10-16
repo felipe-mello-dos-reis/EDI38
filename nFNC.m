@@ -25,17 +25,18 @@ gamma_aco = 7850; %kg/m3
 c = 0.02; % m
 b = 0.20; % m
 h = 0.32; % m
-d = 0.05;
+d = 0.05; % m
 nc = 3;
 nb = [2 2 2];
 phi = 0.010; % m
-y_s = linspace(-(h/2-d),(h/2-d),nc)
-% M_d = 110000*1e-6*1.4; %MN*m #Majorar esforços
-% N_d = 0.8160;
-% M_d = 0.0373;
-N_d = 0.8160;
-M_d = -0.0560;
+y_s = linspace(-(h/2-d),(h/2-d),nc);
 
+% Esforcos solicitantes
+
+N_d = 0.1641; % MN # Majorar esforcos
+M_d = 0.0427; % MN*m # Majorar esforcos
+
+% Inicializando variaveis
 
 epsilon_c2 = 0; % por mil
 epsilon_cu = 0; % por mil
@@ -82,14 +83,12 @@ M_s = Ms(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0,k);
 
 N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
 M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
-% N_r = double(N_c + N_s)
-% M_r = double(M_c + M_s)
-% I_0_epsilon_0 = I0(epsilon_0, epsilon_c2, sigma_cd,n)
-% I_1_epsilon_0 = I1(epsilon_0, epsilon_c2, sigma_cd,n)
+
+N_r = double(N_c + N_s);
+M_r = double(M_c + M_s);
 
 epsilon_t = epsilon_0 + y_t*k;
 epsilon_b =  epsilon_0 + y_b*k;
-% J_c = Jc(epsilon_t,epsilon_b, epsilon_0, epsilon_c2, sigma_cd,n,b,k,h,tol_k)
 
 
 %% Metodo de Newton Raphson
@@ -159,12 +158,12 @@ C = [(u+10)/(y_t-min(y_s));u-y_t*((u+10)/(y_t-min(y_s)))];
 D = [0;-10];
 E = [(u+10)/(y_b-max(y_s));u-y_b*((u+10)/(y_b-max(y_s)))];
 F = [-u/h;-u*y_b/h];
-points = [A B C D E F A]
+points = [A B C D E F A];
 figure(1);
 set(gca, 'FontSize', 12);
 set(gca, 'TickLabelInterpreter', 'latex');
 plot(points(1,:),points(2,:),'-b', 'LineWidth', 2);
-% Get the current axes
+% Plotar eixos
 ax = gca;
 ax.XAxisLocation = 'origin';
 ax.YAxisLocation = 'origin';xlabel('$\kappa \; (1/m)$', Interpreter='latex')
@@ -174,8 +173,8 @@ ylim(1.1*[min(points(2,:)) max(points(2,:))])
 title('Regiao viavel para o dimensionamento', Interpreter='latex')
 
 hold on
-plot(k_it,epsilon_0_it,'-rx')
-% plot(5.9858,0.9027, 'gx')
+plot(k_it,epsilon_0_it,'-g')
+plot(k_it(length(k_it)),epsilon_0_it(length(epsilon_0_it)),'-gx')
 hold off
 end
 
@@ -189,7 +188,7 @@ D = [0;-10];
 E = [(u+10)/(y_b-max(y_s));u-y_b*((u+10)/(y_b-max(y_s)))];
 F = [-u/h;-u*y_b/h];
 points = [A B C D E F A];
-% Number of points you want to generate
+
 num_points = 100;
 kappa_values = [];
 epsilon_0_values = [];
@@ -202,7 +201,6 @@ N_r_values = zeros(1,length(kappa_values));
 M_r_values = zeros(1,length(epsilon_0_values));
 
 for j=1:length(kappa_values)
-    % fprintf("Iteracao %d\n",j)
     N_c = Nc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
     M_c = Mc(epsilon_0_values(j), kappa_values(j), epsilon_c2, sigma_cd,n,y_b,y_t,b,h,tol_k);
     N_s = Ns(y_s,nb,phi,f_yd,epsilon_yd,epsilon_0_values(j),kappa_values(j));
@@ -213,7 +211,7 @@ end
 
 figure(2);
 plot(N_r_values, M_r_values, '-r', 'LineWidth', 2);
-% Get the current axes
+% Plotar eixos
 ax = gca;
 ax.XAxisLocation = 'origin';
 ax.YAxisLocation = 'origin';xlabel('$N_r \; (kN)$', 'Interpreter', 'latex');
@@ -228,20 +226,21 @@ end
 
 %% Funcoes potencial
 
-function I_m = Im(epsilon, epsilon_c2, sigma_cd,n,m)
-syms csi
-if epsilon <= 0
-    I_m = 0;
-else
-    if (0 < epsilon) && (epsilon <= epsilon_c2)
-        I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon);
-    else
-        if epsilon > epsilon_c2
-            I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon_c2) + sigma_cd*int(power(csi,m),csi,epsilon_c2,epsilon);
-        end
-    end
-end
-end
+% Nao usada
+% function I_m = Im(epsilon, epsilon_c2, sigma_cd,n,m)
+% syms csi
+% if epsilon <= 0
+%     I_m = 0;
+% else
+%     if (0 < epsilon) && (epsilon <= epsilon_c2)
+%         I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon);
+%     else
+%         if epsilon > epsilon_c2
+%             I_m = int(sigma_cd*(1-power(1-csi/epsilon_c2,n))*power(csi,m),csi,0,epsilon_c2) + sigma_cd*int(power(csi,m),csi,epsilon_c2,epsilon);
+%         end
+%     end
+% end
+% end
 
 function I_0 = I0(epsilon, epsilon_c2, sigma_cd,n)
     if epsilon < 0
@@ -268,9 +267,10 @@ function I_1 = I1(epsilon, epsilon_c2, sigma_cd,n)
     end
 end
 
-function DI_m = DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,m)
-DI_m = Im(epsilon_t, epsilon_c2, sigma_cd,n,m)-Im(epsilon_b, epsilon_c2, sigma_cd,n,m);
-end
+% Nao usada
+% function DI_m = DIm(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n,m)
+% DI_m = Im(epsilon_t, epsilon_c2, sigma_cd,n,m)-Im(epsilon_b, epsilon_c2, sigma_cd,n,m);
+% end
 
 function DI_0 = DI0(epsilon_t,epsilon_b, epsilon_c2, sigma_cd,n)
 DI_0 = I0(epsilon_t, epsilon_c2, sigma_cd,n)-I0(epsilon_b, epsilon_c2, sigma_cd,n);
@@ -301,17 +301,18 @@ else
 end
 end
 
-function D_s = Ds(epsilon_s,f_yd,epsilon_yd)
-if (epsilon_s < -epsilon_yd)
-    D_s = 0;
-else
-    if (-epsilon_yd < epsilon_s) && (epsilon_s < epsilon_yd)
-        D_s = f_yd/epsilon_yd; %% ? pode estar errado
-    else
-        D_s = 0;
-    end
-end
-end
+% Nao usada
+% function D_s = Ds(epsilon_s,f_yd,epsilon_yd)
+% if (epsilon_s < -epsilon_yd)
+%     D_s = 0;
+% else
+%     if (-epsilon_yd < epsilon_s) && (epsilon_s < epsilon_yd)
+%         D_s = f_yd/epsilon_yd*1000; %% ? pode estar errado
+%     else
+%         D_s = 0;
+%     end
+% end
+% end
 
 %% Esforco do concreto
 
@@ -401,7 +402,7 @@ if (epsilon_s(i) < -epsilon_yd)
     D_si = 0;
 else
     if (-epsilon_yd <= epsilon_s(i)) && (epsilon_s(i) <= epsilon_yd)
-        D_si = E_s*1000; %1000;
+        D_si = E_s*1000; % MPa;
     else
         D_si = 0;
     end
@@ -454,7 +455,5 @@ end
 %% Calculo do momento estatico
 
 function s = S(b,y_b,y_t)
-% syms y
-% s = double(b*int(y,y,y_b,y_t));
-s = (power(y_t,2)-power(y_b,2))/2; %secao retangular
+s = b*(power(y_t,2)-power(y_b,2))/2; %secao retangular
 end
