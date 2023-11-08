@@ -30,7 +30,7 @@ function [ER, SIGMAcd, Ec2, Ecu] = EsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2
     elseif (abs(DEF_3 * h) >= TOL_k)
         ERc = EsforcosConcreto(DEF, h, TOL_k, TOL_DEF, Xc, Yc, INC, Xs, Ys, As, AREA, Sx, Sy, SIGMAcd, n, Ec2, Nc, SINAL_DA_CIRCUICAO);
     else
-        SIGMA0 = TensaoDeformacaoConcreto(DEF(1), SIGMAcd, n, Ec2, Eyd);
+        SIGMA0 = TensaoDeformacaoConcreto(DEF(1), SIGMAcd, Ec2, n);
         ERc(1) = SIGMA0 * AREA;
         ERc(2) = SIGMA0 * Sx;
         ERc(3) = SIGMA0 * Sy;

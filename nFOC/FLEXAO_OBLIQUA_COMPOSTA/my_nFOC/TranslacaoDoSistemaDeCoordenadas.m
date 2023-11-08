@@ -6,18 +6,18 @@ function [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys)
     % Ys: Coordenadas y dos pontos do aço
     
     % Cálculo dos parâmetros da seção
-    Nc = size(Xc, 1);
-    Ns = size(Xs, 1);
+    Nc = size(Xc,2);
+    Ns = size(Xs,2);
     
     AREA = 0;
     Sx = 0;
     Sy = 0;
     
-    for I = 1:Nc
-        ai = Xc(I, 1) * Yc(I, 2) - Xc(I, 2) * Yc(I, 1);
+    for I = 1:(Nc-1)
+        ai = Xc(I) * Yc(I+1) - Xc(I+1) * Yc(I);
         AREA = AREA + ai;
-        Sx = Sx + ai * (Yc(I, 1) + Yc(I, 2));
-        Sy = Sy + ai * (Xc(I, 1) + Xc(I, 2));
+        Sx = Sx + ai * (Yc(I) + Yc(I+1));
+        Sy = Sy + ai * (Xc(I) + Xc(I+1));
     end
 
     AREA = (1 / 2) * AREA;
@@ -29,10 +29,8 @@ function [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys)
 
     % Translação das coordenadas
     for I = 1:Nc
-        Xc(I, 1) = Xc(I, 1) - Xcg;
-        Xc(I, 2) = Xc(I, 2) - Xcg;
-        Yc(I, 1) = Yc(I, 1) - Ycg;
-        Yc(I, 2) = Yc(I, 2) - Ycg;
+        Xc(I) = Xc(I) - Xcg;
+        Yc(I) = Yc(I) - Ycg;
     end
 
     for I = 1:Ns
