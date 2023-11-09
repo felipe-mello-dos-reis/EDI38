@@ -8,12 +8,12 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     Xc(1) = 0.0;
     Yc(1) = 0.0;
-    Xc(2) = 20.0;
+    Xc(2) = -1.0;
     Yc(2) = 0.0;
-    Xc(3) = 20.0;
-    Yc(3) = 50.0;
+    Xc(3) = -1.0;
+    Yc(3) = -1.0;
     Xc(4) = 0.0;
-    Yc(4) = 50.0;
+    Yc(4) = -1.0;
     Xc(5) = Xc(1);
     Yc(5) = Yc(1);
     
@@ -32,10 +32,11 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %% PROPRIEDADES DO CONCRETO     
     % Efeito Rüsch   fck (kN/cm2)        gamac    
-    Rusch = 0.85;
+    % Rusch = 0.85;
     fck = 2.0;
-    gamma_c = 1.5;
-    SIGMAcd = Rusch*fck/gamma_c; %MPa
+    % gamma_c = 1.5;
+    % SIGMAcd = Rusch*fck/gamma_c; %MPa
+    SIGMAcd = 1;
     
     fck = fck*10; % convertendo para MPa
     
@@ -57,23 +58,14 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %% COORDENADAS DAS BARRAS DA ARMADURA E ÁREAS
     
-    Nc = 4; % N de vertices
-    Ns = 4; % N de barras
-    phi = 2.5;
-    % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
     
-    Xs(1) = 3.0;
-    Ys(1) = 3.0;
-    As(1) = pi*phi^2/4;
-    Xs(2) = 17.0;
-    Ys(2) = 3.0;
-    As(2) = pi*phi^2/4;
-    Xs(3) = 17.0;
-    Ys(3) = 47.0;
-    As(3) = pi*phi^2/4;
-    Xs(4) = 3.0;
-    Ys(4) = 47.0;
-    As(4) = pi*phi^2/4;
+    % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
+    Xs = [];
+    Ys = [];
+    As = [];
+    
+    Nc = length(Xc)-1;
+    Ns = length(Xs);
     
     %% PROPRIEDADES DO AÇO     
     % Classe   fYk(kN/cm²)     gamas     Es(kN/cm²)         
@@ -88,9 +80,9 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
     % E0         kx(1/cm)      ky(1/cm)      
-    DEF(1) = 0.78947;
-    DEF(2) = -0.01486;
-    DEF(3) = -0.04710;
+    DEF(1) = 3.5;
+    DEF(2) = 0.0;
+    DEF(3) = 3.5;
     
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      

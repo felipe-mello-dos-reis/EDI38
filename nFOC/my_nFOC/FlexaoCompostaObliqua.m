@@ -6,7 +6,7 @@ function FlexaoCompostaObliqua
     [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, OBJETIVO_DA_ANALISE] = EntradaDeDados;    
     % Traduz o sistema de coordenadas
     [AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax] = PropriedadesGeometricasDaSecao(Xc, Yc, Xs, Ys, As, Nc, Ns);
-    [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys);
+    % [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys);
 
     % Realiza a análise selecionada
     switch OBJETIVO_DA_ANALISE
@@ -35,5 +35,5 @@ function FlexaoCompostaObliqua
     fprintf('SOLUÇÃO CONCLUÍDA\n\n');
     TF = cputime;
     fprintf('TRABALHO COMPUTACIONAL, SEGUNDOS %e\n', TF - TI);
-    
+    ER
 end
