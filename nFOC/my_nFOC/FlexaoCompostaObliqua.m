@@ -16,16 +16,16 @@ function FlexaoCompostaObliqua
              DiagramasEsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
         case 'VERIFICACAO_SECAO'
             [Nd, Mdx, Mdy] = VerificacaoSecao(Nds, Mdxs, Mdys);
-        case 'DIMENSIONAMENTO_CONTINUO'
-            DimensionamentoContinuo;
+        % case 'DIMENSIONAMENTO_CONTINUO'
+        %     DimensionamentoContinuo;
         case 'DIMENSIONAMENTO_PRATICO'
             DimensionamentoPratico;
-        case 'VERIFICACAO_ESTABILIDADE_PILAR'
-            VerificacaoEstabilidadePilar;
-        case 'MOMENTO_CURVATURA'
-            MomentoCurvatura;
-        case 'TRAJETORIA_EQUILIBRIO_PILAR'
-            TrajetoriaEquilibrioPilar;
+        % case 'VERIFICACAO_ESTABILIDADE_PILAR'
+        %     VerificacaoEstabilidadePilar;
+        % case 'MOMENTO_CURVATURA'
+        %     MomentoCurvatura;
+        % case 'TRAJETORIA_EQUILIBRIO_PILAR'
+        %     TrajetoriaEquilibrioPilar;
     end
     
     for I = 1:5

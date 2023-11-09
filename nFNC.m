@@ -33,8 +33,8 @@ y_s = linspace(-(h/2-d),(h/2-d),nc);
 
 % Esforcos solicitantes
 
-N_d = 0.1641; % MN # Majorar esforcos
-M_d = 0.0427; % MN*m # Majorar esforcos
+N_d = 1.1657; % MN # Majorar esforcos
+M_d = 0.0373; % MN*m # Majorar esforcos
 
 % Inicializando variaveis
 
@@ -145,7 +145,6 @@ ELU(epsilon_0,k,y_b,y_t,y_s,epsilon_c2,epsilon_cu)
 
 plot_epsilon_0_k(epsilon_c2,epsilon_cu,h,y_t,y_b,y_s,epsilon_0_it,k_it)
 plot_N_r_M_r(epsilon_c2,epsilon_cu,sigma_cd,n,b,f_yd,epsilon_yd,h,y_t,y_b,y_s,phi,nb,tol_k)
-
 
 %% Funcoes de plot
 
@@ -402,7 +401,7 @@ if (epsilon_s(i) < -epsilon_yd)
     D_si = 0;
 else
     if (-epsilon_yd <= epsilon_s(i)) && (epsilon_s(i) <= epsilon_yd)
-        D_si = E_s*1000; % MPa;
+        D_si = E_s; % MPa;
     else
         D_si = 0;
     end
