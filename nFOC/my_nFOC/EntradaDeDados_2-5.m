@@ -1,6 +1,5 @@
 function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, OBJETIVO_DA_ANALISE] = EntradaDeDados
 
-    %% ?? Verificar Eyd
     
     %% COORDENADAS DOS PONTOS DA SEÇÃO POLIGONAL DE CONCRETO
     

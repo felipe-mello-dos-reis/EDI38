@@ -7,16 +7,20 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     Xc(1) = 0.0;
     Yc(1) = 0.0;
-    Xc(2) = 20.0;
+    Xc(2) = 40.0;
     Yc(2) = 0.0;
-    Xc(3) = 20.0;
-    Yc(3) = 50.0;
-    Xc(4) = 0.0;
-    Yc(4) = 50.0;
-    Xc(5) = Xc(1);
-    Yc(5) = Yc(1);
+    Xc(3) = 40.0;
+    Yc(3) = 12.0;
+    Xc(4) = 12.0;
+    Yc(4) = 12.0;
+    Xc(5) = 12.0;
+    Yc(5) = 40.0;
+    Xc(6) = 0.0;
+    Yc(6) = 40.0;
+    Xc(7) = Xc(1);
+    Yc(7) = Yc(1);
     
-    
+
     %% INCIDENCIA DAS ARESTAS DA SEÇÃO POLIGONAL DE CONCRETO
     % ARESTA        PONTO1          PONTO2
     INC(1,1) = 1;
@@ -26,7 +30,11 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     INC(1,3) = 3;
     INC(2,3) = 4;
     INC(1,4) = 4;
-    INC(2,4) = 1;
+    INC(2,4) = 5;
+    INC(1,5) = 5;
+    INC(2,5) = 6;
+    INC(1,6) = 6;
+    INC(2,6) = 1;
     INC = INC';
     
     %% PROPRIEDADES DO CONCRETO     
@@ -35,6 +43,7 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     fck = 2.0;
     gamma_c = 1.5;
     SIGMAcd = Rusch*fck/gamma_c; %MPa
+
     
     fck = fck*10; % convertendo para MPa
     
@@ -55,20 +64,15 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     fck = fck/10; % retornando para kN/cm2
     
     %% COORDENADAS DAS BARRAS DA ARMADURA E ÁREAS
-    % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
     
-    Xs(1) = 3.0;
-    Ys(1) = 3.0;
-    Xs(2) = 17.0;
-    Ys(2) = 3.0;
-    Xs(3) = 17.0;
-    Ys(3) = 47.0;
-    Xs(4) = 3.0;
-    Ys(4) = 47.0;
+    phi = 1.6;
+    % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
+    Xs = [3, 9, 37, 3, 37, 3, 9];
+    Ys = [3, 3, 3, 9, 9, 37, 37];
     As = pi()*phi^2/4*ones(size(Xs));
+    
     Nc = length(Xc)-1;
     Ns = length(Xs);
-    phi = 2.5;
     
     %% PROPRIEDADES DO AÇO     
     % Classe   fYk(kN/cm²)     gamas     Es(kN/cm²)         
@@ -83,15 +87,15 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
     % E0         kx(1/cm)      ky(1/cm)      
-    DEF(1) = 0.78947;
-    DEF(2) = -0.01486;
-    DEF(3) = -0.04710;
-    
+    DEF(1) = 1.51929;
+    DEF(2) = 0.00488;
+    DEF(3) = -0.12441;
+
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
-    Nd = 1000.0;
+    Nd = 2000.0;
     Mdx = -5000.0;
-    Mdy = -2000.0;  
+    Mdy = -12000.0;  
     
     % TOLERANCIA PARA A NORMA ADMENSIONAL DO VETOR F NO PROBLEMA DE VERIFICAÇÃO (MÉTODO DE NEWTON-RHAPSON)          
     TOL_F = 1e-5 ;

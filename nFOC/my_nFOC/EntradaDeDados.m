@@ -1,6 +1,5 @@
 function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, OBJETIVO_DA_ANALISE] = EntradaDeDados
 
-    %% ?? Verificar Eyd
     
     %% COORDENADAS DOS PONTOS DA SEÇÃO POLIGONAL DE CONCRETO
     
@@ -8,12 +7,12 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     Xc(1) = 0.0;
     Yc(1) = 0.0;
-    Xc(2) = -1.0;
+    Xc(2) = 20.0;
     Yc(2) = 0.0;
-    Xc(3) = -1.0;
-    Yc(3) = -1.0;
+    Xc(3) = 20.0;
+    Yc(3) = 50.0;
     Xc(4) = 0.0;
-    Yc(4) = -1.0;
+    Yc(4) = 50.0;
     Xc(5) = Xc(1);
     Yc(5) = Yc(1);
     
@@ -32,11 +31,10 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %% PROPRIEDADES DO CONCRETO     
     % Efeito Rüsch   fck (kN/cm2)        gamac    
-    % Rusch = 0.85;
+    Rusch = 0.85;
     fck = 2.0;
-    % gamma_c = 1.5;
-    % SIGMAcd = Rusch*fck/gamma_c; %MPa
-    SIGMAcd = 1;
+    gamma_c = 1.5;
+    SIGMAcd = Rusch*fck/gamma_c; %MPa
     
     fck = fck*10; % convertendo para MPa
     
@@ -57,13 +55,18 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     fck = fck/10; % retornando para kN/cm2
     
     %% COORDENADAS DAS BARRAS DA ARMADURA E ÁREAS
-    
-    
     % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
-    Xs = [];
-    Ys = [];
-    As = [];
     
+    Xs(1) = 3.0;
+    Ys(1) = 3.0;
+    Xs(2) = 17.0;
+    Ys(2) = 3.0;
+    Xs(3) = 17.0;
+    Ys(3) = 47.0;
+    Xs(4) = 3.0;
+    Ys(4) = 47.0;
+    phi = 2.5;
+    As = pi()*phi^2/4*ones(size(Xs));
     Nc = length(Xc)-1;
     Ns = length(Xs);
     
@@ -80,15 +83,32 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
     % E0         kx(1/cm)      ky(1/cm)      
-    DEF(1) = 3.5;
-    DEF(2) = 0.0;
-    DEF(3) = 3.5;
+    DEF(1) = 0.79559;
+    DEF(2) = -1.50523/100;
+    DEF(3) = -4.76393/100;
     
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
+
+    % Nd = 1000.0;
+    % Mdx = -5000.0;
+    % Mdy = -2000.0;  
+
+    % Nd = 1000.0;
+    % Mdx = -14000.0;
+    % Mdy = -2000.0;
+
+    % Nd = 1000.0;
+    % Mdx = -16244.0;
+    % Mdy = -2000.0;
+
     Nd = 1000.0;
-    Mdx = -5000.0;
+    Mdx = -17000.0;
     Mdy = -2000.0;  
+
+    % Nd = 1000.0;
+    % Mdx = -3000.0;
+    % Mdy = -8000.0;  
     
     % TOLERANCIA PARA A NORMA ADMENSIONAL DO VETOR F NO PROBLEMA DE VERIFICAÇÃO (MÉTODO DE NEWTON-RHAPSON)          
     TOL_F = 1e-5 ;
@@ -119,6 +139,6 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % NuMERO DE PASSOS PARA A CONSTRUÇÃO DA TRAJETÓRIA DE EQUILÍBRIO DO PILAR              
     %           500 
     
-    OBJETIVO_DA_ANALISE = 'ESFORCOS_RESISTENTES'; % Altere para a análise desejada
+    OBJETIVO_DA_ANALISE = 'VERIFICACAO_SECAO'; % Altere para a análise desejada
     
     

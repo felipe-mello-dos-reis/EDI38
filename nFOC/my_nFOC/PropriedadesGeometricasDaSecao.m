@@ -1,5 +1,4 @@
 function [AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax] = PropriedadesGeometricasDaSecao(Xc, Yc, Xs, Ys, As, Nc, Ns)
-    %% ?? Verificar Ixy
     AREA = 0;
     Sx = 0;
     Sy = 0;
@@ -14,8 +13,7 @@ function [AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmi
         Sy = Sy + ai * (Xc(I) + Xc(I+1));
         Ixx = Ixx + ai * (Yc(I)^2 + Yc(I) * Yc(I+1) + Yc(I+1)^2);
         Iyy = Iyy + ai * (Xc(I)^2 + Xc(I) * Xc(I+1) + Xc(I+1)^2);
-        %% ?? Parenteses a mais
-        Ixy = Ixy + ai * (Xc(I) * Yc(I+1) + 2 * (Xc(I) * Yc(I) + Xc(I+1) * Yc(I+1) + Xc(I+1) * Yc(I)));
+        Ixy = Ixy + ai * (Xc(I) * Yc(I+1) + 2 * (Xc(I) * Yc(I) + Xc(I+1) * Yc(I+1)) + Xc(I+1) * Yc(I));
     end
 
     SINAL_DA_CIRCUICAO = AREA;

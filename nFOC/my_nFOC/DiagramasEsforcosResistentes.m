@@ -1,5 +1,4 @@
 function DiagramasEsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax)
-    %% ?? Precisa passar como argumento as variaveis
     % Define os pontos PA, PB, PC, PD, PE e PF
     Ymax = max(Yc);
     Ymin = min(Yc);

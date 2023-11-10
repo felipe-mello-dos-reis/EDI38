@@ -1,4 +1,4 @@
-function [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys)
+function [Xc, Yc, Xs, Ys, Ysmax, Ysmin] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys)
     % Entradas:
     % Xc: Coordenadas x dos vértices do contorno
     % Yc: Coordenadas y dos vértices do contorno
@@ -37,4 +37,7 @@ function [Xc, Yc, Xs, Ys] = TranslacaoDoSistemaDeCoordenadas(Xc, Yc, Xs, Ys)
         Xs(I) = Xs(I) - Xcg;
         Ys(I) = Ys(I) - Ycg;
     end
+
+    Ysmax = max(Ys);
+    Ysmin = min(Ys);
 end
