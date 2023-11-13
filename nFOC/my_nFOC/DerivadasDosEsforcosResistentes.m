@@ -27,7 +27,7 @@ if abs(DEF(2)*h) >= TOL_k
         % IntegraisDiagramaTensaoDeformacao(Ei_1, I1i_1, I2i_1, I3i_1, J1i_1, J2i_1, K1i_1);
         [I1i_1, I2i_1, I3i_1, J1i_1, J2i_1, K1i_1] = IntegraisDiagramaTensaoDeformacao(Ei_1, SIGMAcd, n, Ec2);
         % TensaoDeformacaoConcreto(Ei, SIGMAi);
-        SIGMAi = TensaoDeformacaoConcreto(Ei, SIGMAcd, Ec2, n)
+        SIGMAi = TensaoDeformacaoConcreto(Ei, SIGMAcd, Ec2, n);
         
         DI1i = I1i_1 - I1i;
         DJ1i = J1i_1 - J1i;
