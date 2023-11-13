@@ -116,7 +116,7 @@ function DiagramasEsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys,
     xlim(1.1*[min(points(1,:)) max(points(1,:))])
     ylim(1.1*[min(points(2,:)) max(points(2,:))])
     title('Regiao viavel para o dimensionamento')
-    print -depsc2 ../../images/nFOC_diagrama_regiao_viavel.eps
+    % print -depsc2 ../../images/nFOC_diagrama_regiao_viavel.eps
 
 
     figure(2);
@@ -127,7 +127,7 @@ function DiagramasEsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys,
     xlim([min(DIAGRAMA_Nr_Mrx(:, 1))*1.1, max(DIAGRAMA_Nr_Mrx(:, 1))*1.1]);
     ylim([min(DIAGRAMA_Nr_Mrx(:, 2))*1.1, max(DIAGRAMA_Nr_Mrx(:, 2))*1.1]);
     title('Esforcos Resistentes (\kappa_y = 0)');
-    print -depsc2 ../../images/nFOC_diagramas_esforcos_resistentes.eps
+    % print -depsc2 ../../images/nFOC_diagramas_esforcos_resistentes.eps
 
     fclose(fid);
 end 

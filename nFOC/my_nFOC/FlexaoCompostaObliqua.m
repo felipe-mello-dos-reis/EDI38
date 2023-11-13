@@ -16,10 +16,10 @@ function FlexaoCompostaObliqua
              DiagramasEsforcosResistentes(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
         case 'VERIFICACAO_SECAO'
             [RUINA_SECAO, DEF, NORMA_F] = VerificacaoSecao(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
-        % case 'DIMENSIONAMENTO_CONTINUO'
-        %     DimensionamentoContinuo;
+        case 'DIMENSIONAMENTO_CONTINUO'
+            [DIMENSIONAVEL, Ast, DEF, NORMA_F] = DimensionamentoContinuo(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
         case 'DIMENSIONAMENTO_PRATICO'
-            [DIMENSIONAVEL, phi, As, DEF, NORMA_F] = DimensionamentoPratico(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
+            [DIMENSIONAVEL, phi, Ast, DEF, NORMA_F] = DimensionamentoPratico(Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk, gamma_s, Es, fyd, Eyd, DEF, Nd, Mdx, Mdy, TOL_F, TOL_J, TOL_DEF, TOL_k, AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmin, Ysmax);
         % case 'VERIFICACAO_ESTABILIDADE_PILAR'
         %     VerificacaoEstabilidadePilar;
         % case 'MOMENTO_CURVATURA'
@@ -28,7 +28,7 @@ function FlexaoCompostaObliqua
         %     TrajetoriaEquilibrioPilar;
     end
     
-    for I = 1:5
+    for I = 1:10
         fprintf('\n');
     end
     
