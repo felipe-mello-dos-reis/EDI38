@@ -32,6 +32,17 @@ function FlexaoCompostaObliqua
         fprintf('\n');
     end
     
+    figure(3)
+    LN = 1/DEF(2)*(DEF(1) + DEF(3)*linspace(min(min(Xc, Yc))*1.25, max(max(Xc, Yc))*1.25,100));
+    plot(Xc, Yc, '-b', Xs, Ys, '*r',  linspace(min(min(Xc, Yc))*1.25, max(max(Xc, Yc))*1.25,100), LN, '--g')
+    xlabel('x (cm)')
+    ylabel('y (cm)')
+    title('Secao Transversal')
+    axis('equal')
+    xlim([min(min(Xc, Yc)) max(max(Xc, Yc))]*1.25)
+    ylim([min(min(Xc, Yc)) max(max(Xc, Yc))]*1.25)
+    print -depsc2 ../../images/nFOC_q5.eps
+
     fprintf('SOLUÇÃO CONCLUÍDA\n\n');
     TF = cputime;
     fprintf('TRABALHO COMPUTACIONAL, SEGUNDOS %e\n', TF - TI);

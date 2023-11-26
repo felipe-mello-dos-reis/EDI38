@@ -7,7 +7,7 @@ close all
 clc
 
 % Especificacoes concreto
-fck = 30; %MPa
+fck = 90; %MPa
 gamma_c = 1.4;
 sigma_cd = 0.85*fck/gamma_c; %MPa
 gamma_conc = 2500; %kg/m3
@@ -22,19 +22,19 @@ gamma_aco = 7850; %kg/m3
 
 
 % Especificacoes de design
-c = 0.02; % m
+c = 0.04; % m
 b = 0.20; % m
-h = 0.32; % m
-d = 0.05; % m
+h = 0.60; % m
+d = 0.04; % m
 nc = 3;
 nb = [2 2 2];
-phi = 0.010; % m
-y_s = linspace(-(h/2-d),(h/2-d),nc);
+phi = 0.025; % m
+y_s = [-0.26, -0.14, 0.26];
 
 % Esforcos solicitantes
 
-N_d = 0.1641; % MN # Majorar esforcos
-M_d = 0.0427; % MN*m # Majorar esforcos
+N_d = 1.5; % MN # Majorar esforcos
+M_d = 0.6; % MN*m # Majorar esforcos
 
 % Inicializando variaveis
 
@@ -58,7 +58,7 @@ if fck <= 50
     epsilon_c2 = 2;
     epsilon_cu = 3.5;
 else
-    if (50 < fck) && (fck < 90)
+    if (50 < fck) && (fck <= 90)
         x_lim = 0.35*d;
         n = 1.4 + 23.4*power((90-fck)/100,4);
         epsilon_c2 = 2 + 0.085*power(fck-50,0.53);
@@ -165,8 +165,7 @@ plot(points(1,:),points(2,:),'-b', 'LineWidth', 2);
 % Plotar eixos
 ax = gca;
 ax.XAxisLocation = 'origin';
-ax.YAxisLocation = 'origin';
-xlabel('$\kappa \; (1/m)$', Interpreter='latex')
+ax.YAxisLocation = 'origin';xlabel('$\kappa \; (1/m)$', Interpreter='latex')
 ylabel('$\epsilon_0$', Interpreter='latex')
 xlim(1.1*[min(points(1,:)) max(points(1,:))])
 ylim(1.1*[min(points(2,:)) max(points(2,:))])
@@ -214,8 +213,7 @@ plot(N_r_values, M_r_values, '-r', 'LineWidth', 2);
 % Plotar eixos
 ax = gca;
 ax.XAxisLocation = 'origin';
-ax.YAxisLocation = 'origin';
-xlabel('$N_r \; (kN)$', 'Interpreter', 'latex');
+ax.YAxisLocation = 'origin';xlabel('$N_r \; (kN)$', 'Interpreter', 'latex');
 ylabel('$M_r \; (kNm)$', 'Interpreter', 'latex');
 xlim([min(N_r_values)*1.1, max(N_r_values)*1.1]);
 ylim([min(M_r_values)*1.1, max(M_r_values)*1.1]);

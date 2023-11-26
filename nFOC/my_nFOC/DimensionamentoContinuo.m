@@ -3,7 +3,7 @@ function [DIMENSIONAVEL, Ast, DEF, NORMA_F] = DimensionamentoContinuo(Xc, Yc, IN
     DIMENSIONAVEL = false;
 
     As_left = 0.0;
-    As_right = 0.04*AREA;
+    As_right = 0.3*AREA; % Limite max = 0.04
     It_max = 10000;
     I = 0;
     psi = 1/2;

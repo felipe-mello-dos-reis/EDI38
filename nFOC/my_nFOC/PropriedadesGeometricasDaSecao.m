@@ -73,4 +73,13 @@ function [AREA, Sx, Sy, Ixx, Iyy, Ixy, SINAL_DA_CIRCUICAO, Ast, Tr_I, b, h, Ysmi
         Ysmin = min(Ys);
         Ysmax = max(Ys);
     end
+
+    % figure(3)
+    % plot(Xc, Yc, '-b', Xs, Ys, '*r')
+    % xlabel('x (cm)')
+    % ylabel('y (cm)')
+    % title('Secao Transversal')
+    % axis('equal')
+    % xlim([min(min(Xc, Yc)) max(max(Xc, Yc))]*1.25)
+    % ylim([min(min(Xc, Yc)) max(max(Xc, Yc))]*1.25)
 end

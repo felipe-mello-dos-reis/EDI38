@@ -10,9 +10,9 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     Xc(2) = 20.0;
     Yc(2) = 0.0;
     Xc(3) = 20.0;
-    Yc(3) = 50.0;
+    Yc(3) = 60.0;
     Xc(4) = 0.0;
-    Yc(4) = 50.0;
+    Yc(4) = 60.0;
     Xc(5) = Xc(1);
     Yc(5) = Yc(1);
     
@@ -32,8 +32,8 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     %% PROPRIEDADES DO CONCRETO     
     % Efeito Rüsch   fck (kN/cm2)        gamac    
     Rusch = 0.85;
-    fck = 2.0;
-    gamma_c = 1.5;
+    fck = 9.0;
+    gamma_c = 1.4;
     SIGMAcd = Rusch*fck/gamma_c; %MPa
     
     fck = fck*10; % convertendo para MPa
@@ -44,7 +44,7 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
         Ec2 = 2;
         Ecu = 3.5;
     else
-        if (50 < fck) && (fck < 90)
+        if (50 < fck) && (fck <= 90)
             % x_lim = 0.35*d;
             n = 1.4 + 23.4*power((90-fck)/100,4);
             Ec2 = 2 + 0.085*power(fck-50,0.53);
@@ -57,16 +57,23 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     %% COORDENADAS DAS BARRAS DA ARMADURA E ÁREAS
     % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
     
-    Xs(1) = 3.0;
-    Ys(1) = 3.0;
-    Xs(2) = 17.0;
-    Ys(2) = 3.0;
-    Xs(3) = 17.0;
-    Ys(3) = 47.0;
-    Xs(4) = 3.0;
-    Ys(4) = 47.0;
+    Xs(1) = 4.0;
+    Ys(1) = 4.0;
+    Xs(2) = 16.0;
+    Ys(2) = 4.0;
+    Xs(3) = 4.0;
+    Ys(3) = 44.0;
+    Xs(4) = 16.0;
+    Ys(4) = 44.0;
+    Xs(5) = 4.0;
+    Ys(5) = 56.0;
+    Xs(6) = 16.0;
+    Ys(6) = 56.0;
+    
+
     phi = 2.5;
     As = pi()*phi^2/4*ones(size(Xs));
+    As(2) = pi()*2^2/4;
     Nc = length(Xc)-1;
     Ns = length(Xs);
     
@@ -75,7 +82,7 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     classe_aco = 'A';
     fyk = 50.0;
     gamma_s =  1.15;
-    Es = 20000.0;
+    Es = 21000.0;
     fyd = fyk/gamma_s;
     Eyd = fyd/Es*1000; % por mil
     
@@ -83,15 +90,32 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
     % E0         kx(1/cm)      ky(1/cm)      
-    DEF(1) = 0.78947;
-    DEF(2) = -0.01486;
-    DEF(3) = -0.04710;
+    DEF(1) = 0.2734;
+    DEF(2) = -7.7542/100;
+    DEF(3) = 0.0/100;
     
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
-    Nd = 1000.0;
-    Mdx = -5000.0;
-    Mdy = -2000.0;  
+
+    Nd = 1500.0*1;
+    Mdx = 60000.0*1;
+    Mdy = 0.0;  
+
+    % Nd = 1000.0;
+    % Mdx = -14000.0;
+    % Mdy = -2000.0;
+
+    % Nd = 1000.0;
+    % Mdx = -16244.0;
+    % Mdy = -2000.0;
+
+    % Nd = 1000.0;
+    % Mdx = -5000.0;
+    % Mdy = -2000.0;  
+
+    % Nd = 1000.0;
+    % Mdx = -3000.0;
+    % Mdy = -8000.0;  
     
     % TOLERANCIA PARA A NORMA ADMENSIONAL DO VETOR F NO PROBLEMA DE VERIFICAÇÃO (MÉTODO DE NEWTON-RHAPSON)          
     TOL_F = 1e-5 ;
@@ -122,6 +146,7 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % NuMERO DE PASSOS PARA A CONSTRUÇÃO DA TRAJETÓRIA DE EQUILÍBRIO DO PILAR              
     %           500 
     
-    OBJETIVO_DA_ANALISE = 'ESFORCOS_RESISTENTES'; % Altere para a análise desejada
+    OBJETIVO_DA_ANALISE = 'VERIFICACAO_SECAO'; % Altere para a análise desejada
+    
     
     
