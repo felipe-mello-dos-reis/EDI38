@@ -18,7 +18,7 @@ def Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     Rompeu, epsilon_0, k, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N, M, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
     if Rompeu:
         print('Failure due to lack of resistant capacity')
-        return False, e, f
+        return True, e, f
     while (True):
         M_d = N_d*(e+f)
         Rompeu, epsilon_0, k, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
@@ -95,42 +95,58 @@ def Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     N_d = 0
     f = 0
     dN = sigma_cd*b*h/10
+    passo = dN/(sigma_cd*b*h)
     M_d = N_d*(e+f)
     N = [N_d]
     M = [M_d]
-    Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+    # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
     while dN/(sigma_cd*b*h) > 1e-5:
         N_d = N_d + dN
-        _, _, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
-        M_d = N_d*(e+f)
-        Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+        M_d = N_d*(e)
+        # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+        Rompeu, _, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
+        F = 100*f/h
         if Rompeu == False:
             N.append(N_d)
-            M.append(M_d)
+            M.append(N_d*(e+f))
+            # M_d = N_d*(e+f)
         else:
             N_d = N_d - dN
             dN = dN/10
+            passo = dN/(sigma_cd*b*h)
     nu = np.array(N)/(sigma_cd*b*h)
     mu = np.array(M)/(sigma_cd*b*h**2)
-    plt.figure(figsize=(8, 6))
-    plt.plot(nu, mu, '-r', linewidth=2)
-    plt.xlabel('$ nu $', fontsize=12)
-    plt.ylabel('$ mu $', fontsize=12)
-    plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
-    plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
-    plt.title('Normal critica', fontsize=12)
-    # plt.gca().set_aspect('equal', adjustable='box')
-    plt.grid(True)
-    plt.show()  
-    return nu,mu
+    # plt.figure(figsize=(8, 6))
+    # plt.plot(nu, mu, '-r', linewidth=2)
+    # plt.xlabel('$ nu $', fontsize=12)
+    # plt.ylabel('$ mu $', fontsize=12)
+    # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
+    # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
+    # plt.title('Trajetoria de equilibrio', fontsize=12)
+    # # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.grid(True)
+    # plt.show()
+    N_cr = nu[-1]*sigma_cd*b*h
+    M_cr = mu[-1]*sigma_cd*b*h**2
+    return nu[-1]#, M_cr
 
 fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b = Entrada_de_dados()
 m = 5
 l_e = 20*h
 # Rompeu, e, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
 # print(Rompeu, e, f)
-e = h/3
-print(Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e))
+i = 1
+e = np.zeros(15)
+N_cr = np.zeros(15)
+while i <= 14:
+    e[i] = i*h/10
+    N_cr[i] = Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e[i])
+    i = i + 1
+
+for i in range(len(e)):
+    if i != 0:
+        print(e[i]/h,' : ', N_cr[i])
+
 # Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
 
     
