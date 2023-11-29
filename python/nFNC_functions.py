@@ -81,6 +81,49 @@ def plot_N_r_M_r(epsilon_c2, epsilon_cu, sigma_cd, n, b, f_yd, epsilon_yd, h, y_
     plt.grid(True)
     plt.show()
 
+def N_r_M_r(epsilon_c2, epsilon_cu, sigma_cd, n, b, f_yd, epsilon_yd, h, y_t, y_b, y_s, phi, nb, tol_k):
+    c = epsilon_c2
+    u = epsilon_cu
+    A = [0, c]
+    B = [u / h, u * y_t / h]
+    C = [(u + 10) / (y_t - min(y_s)), u - y_t * ((u + 10) / (y_t - min(y_s)))]
+    D = [0, -10]
+    E = [(u + 10) / (y_b - max(y_s)), u - y_b * ((u + 10) / (y_b - max(y_s)))]
+    F = [-u / h, -u * y_b / h]
+    points = np.array([A, B, C, D, E, F, A]).T
+
+    num_points = 100
+    kappa_values = []
+    epsilon_0_values = []
+    for i in range(6):
+        kappa_values = np.concatenate([kappa_values, np.linspace(points[0, i], points[0, i + 1], num_points)])
+        epsilon_0_values = np.concatenate([epsilon_0_values, np.linspace(points[1, i], points[1, i + 1], num_points)])
+
+    N_r_values = np.zeros(len(kappa_values))
+    M_r_values = np.zeros(len(epsilon_0_values))
+
+    for j in range(len(kappa_values)):
+        N_c = Nc(epsilon_0_values[j], kappa_values[j], epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+        M_c = Mc(epsilon_0_values[j], kappa_values[j], epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+        N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0_values[j], kappa_values[j])
+        M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0_values[j], kappa_values[j])
+        N_r_values[j] = (N_c + N_s)
+        M_r_values[j] = (M_c + M_s)
+
+
+    # N_r_values_it = np.zeros(len(kappa_it))
+    # M_r_values_it = np.zeros(len(epsilon_0_values))
+
+    # for j in range(len(epsilon_0_values)):
+    #     N_c = Nc(epsilon_0_values[j], kappa_values[j], epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+    #     M_c = Mc(epsilon_0_values[j], kappa_values[j], epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+    #     N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0_values[j], kappa_values[j])
+    #     M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0_values[j], kappa_values[j])
+    #     N_r_values_it[j] = (N_c + N_s) * 1e3
+    #     M_r_values_it[j] = (M_c + M_s) * 1e3
+    return N_r_values, M_r_values
+     
+
 def I0(epsilon, epsilon_c2, sigma_cd, n):
     if epsilon < 0:
         I_0 = 0

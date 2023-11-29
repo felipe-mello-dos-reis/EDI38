@@ -10,7 +10,7 @@ def Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     L = l_e/2
     dL = L/m
     tol_DF = 1e-10
-    # Arbitra-se uma flecha tentativa inicial f = 0
+    # An initial tentative deflection is assumed, f = 0
     f = 0
     i=0
     N = F/(b*h)
@@ -99,25 +99,21 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     M_d = N_d*(e+f)
     N = [N_d]
     M = [M_d]
-    # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
     while dN/(sigma_cd*b*h) > 1e-5:
         N_d = N_d + dN
         M_d = N_d*(e)
-        # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         Rompeu, _, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
         F = 100*f/h
         if Rompeu == False:
             N.append(N_d)
             M.append(N_d*(e+f))
-            # M_d = N_d*(e+f)
         else:
             N_d = N_d - dN
             dN = dN/10
-            passo = dN/(sigma_cd*b*h)
     nu = np.array(N)/(sigma_cd*b*h)
     mu = np.array(M)/(sigma_cd*b*h**2)
     plt.figure(figsize=(8, 6))
-    plt.plot(nu, mu, '-r', linewidth=2)
+    plt.plot(nu, mu, '-b', linewidth=2)
     plt.xlabel('$ nu $', fontsize=12)
     plt.ylabel('$ mu $', fontsize=12)
     plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
@@ -126,9 +122,11 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     # plt.gca().set_aspect('equal', adjustable='box')
     plt.grid(True)
     plt.show()
-    N_cr = nu[-1]*sigma_cd*b*h
-    M_cr = mu[-1]*sigma_cd*b*h**2
-    return N_cr, M_cr
+    N = np.array(N)
+    M = np.array(M)
+    # N_cr = N[-1]
+    # M_cr = M[-1]
+    return N, M
 
 
 def Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e):
@@ -139,37 +137,22 @@ def Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     N_d = 0
     f = 0
     dN = sigma_cd*b*h/10
-    passo = dN/(sigma_cd*b*h)
     M_d = N_d*(e+f)
     N = [N_d]
     M = [M_d]
-    # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
     while dN/(sigma_cd*b*h) > 1e-5:
         N_d = N_d + dN
         M_d = N_d*(e)
-        # Rompeu, _, _, _, _, _  = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         Rompeu, _, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
         F = 100*f/h
         if Rompeu == False:
             N.append(N_d)
             M.append(N_d*(e+f))
-            # M_d = N_d*(e+f)
         else:
             N_d = N_d - dN
             dN = dN/10
-            passo = dN/(sigma_cd*b*h)
     nu = np.array(N)/(sigma_cd*b*h)
     mu = np.array(M)/(sigma_cd*b*h**2)
-    # plt.figure(figsize=(8, 6))
-    # plt.plot(nu, mu, '-r', linewidth=2)
-    # plt.xlabel('$ nu $', fontsize=12)
-    # plt.ylabel('$ mu $', fontsize=12)
-    # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
-    # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
-    # plt.title('Trajetoria de equilibrio', fontsize=12)
-    # # plt.gca().set_aspect('equal', adjustable='box')
-    # plt.grid(True)
-    # plt.show()
     N_cr = nu[-1]*sigma_cd*b*h
     M_cr = mu[-1]*sigma_cd*b*h**2
     return N_cr, M_cr
