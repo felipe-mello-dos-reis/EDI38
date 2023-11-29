@@ -212,16 +212,16 @@ def ELU(epsilon_0, k, y_b, y_t, y_s, epsilon_c2, epsilon_cu):
     epsilon_min = min(epsilon_b, epsilon_t)
     epsilon_s_min = min(epsilon_s)
     if epsilon_max > epsilon_cu:
-        print("ELU ultrapassado: polo epsilon_cu!")
+        # print("ELU ultrapassado: polo epsilon_cu!")
         return True    
     if epsilon_s_min < -10:
-        print("ELU ultrapassado: polo epsilon_s!")
+        # print("ELU ultrapassado: polo epsilon_s!")
         return True
     if epsilon_max - (epsilon_cu - epsilon_c2) * (epsilon_max - epsilon_min) / epsilon_cu > epsilon_c2:
-        print("ELU ultrapassado: polo epsilon_c2!")
+        # print("ELU ultrapassado: polo epsilon_c2!")
         return True
     if (epsilon_max <= epsilon_cu) and (epsilon_s_min >= -10) and (epsilon_max - (epsilon_cu - epsilon_c2) * (epsilon_max - epsilon_min) / epsilon_cu <= epsilon_c2):
-        print("ELU ok!")
+        # print("ELU ok!")
         return False
 		
 def Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b):
@@ -269,7 +269,7 @@ def Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, ep
 			k_it.append(k)
 			f_ad = np.sqrt(((N_d - N_r) / (sigma_cd * b * h))**2 + ((M_d - M_r) / (sigma_cd * b * h**2))**2)
 		else:
-			print("No solution exists!")
+			# print("No solution exists!")
 			return True, epsilon_0, k, epsilon_0_it, k_it, f_ad
 
 	return ELU(epsilon_0, k, y_b, y_t, y_s, epsilon_c2, epsilon_cu), epsilon_0, k, epsilon_0_it, k_it, f_ad
