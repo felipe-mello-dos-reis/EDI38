@@ -220,7 +220,7 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     # M_cr = M[-1]
     return N, M
 
-def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e, N_d):
+# def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e, N_d):
     M_d = 0
     f = 0
     k_i = 0
@@ -262,7 +262,86 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     plt.show()
     # N_cr = N[-1]
     # M_cr = M[-1]
-    return M_i, M_e
+    return M_i, M_e, _r
+
+def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e):
+    M_d = 0
+    i = 0
+    k_i = 0
+    xi = (l_e/np.pi)**2
+    dM = sigma_cd*b*h**2/100
+    N = [N_d]
+    M_i = []
+    k = []
+    _r = []
+    M_e = []
+    while dM > sigma_cd*b*h**2/100*1e-9 and i < it_max:
+        Rompeu, epsilon_0_i, k_i, _, _, _ = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d + dM, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k_i, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+        if Rompeu == False:
+            M_d += dM
+            N.append(N_d)
+            M_i.append(M_d)
+            k.append(k_i)
+            _r.append(k_i/1000)
+            M_e.append(N_d*(e + xi*k_i/1000))
+        else:
+            dM = dM/2
+    N = np.array(N)
+    M_i = np.array(M_i)
+    M_e = np.array(M_e)
+    _r = np.array(_r)
+    k = np.array(k)
+    plt.figure(figsize=(8, 6))
+    plt.plot(_r, M_i, '-b', label='M_int', linewidth=2)
+    plt.plot(_r, M_e, '-r', label='M_ext', linewidth=2)
+    plt.xlabel('$ \\frac{1}{r} (m^{-1})$', fontsize=12)
+    plt.ylabel('$ M (MN \\cdot m)$', fontsize=12)
+    # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
+    # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
+    plt.title('Metodo do Pilar Padrao', fontsize=12)
+    plt.legend()
+    # plt.gca().set_aspect('equal', adjustable='box')
+    plt.grid(True)
+    plt.show()
+    # N_cr = N[-1]
+    # M_cr = M[-1]
+    return M_i, M_e, _r
+
+def Pilar_padrao_sol(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e):
+    M_d = 0
+    i = 0
+    k_i = 0
+    xi = (l_e/np.pi)**2
+    dM = sigma_cd*b*h**2/1e4
+    N = [N_d]
+    M_i = []
+    k = []
+    _r = []
+    M_e = []
+    while dM > sigma_cd*b*h**2/100*1e-9 and i < it_max:
+        Rompeu, epsilon_0_i, k_i, _, _, _ = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d + dM, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k_i, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+        if Rompeu == False:
+            M_d += dM
+            N.append(N_d)
+            M_i.append(M_d)
+            k.append(k_i)
+            _r.append(k_i/1000)
+            M_e.append(N_d*(e + xi*k_i/1000))
+        else:
+            dM = dM/2
+    N = np.array(N)
+    M_i = np.array(M_i)
+    M_e = np.array(M_e)
+    _r = np.array(_r)
+    k = np.array(k)
+    sol = []
+    for i in range(len(M_i)):
+        if abs(M_i[i]-M_e[i])/(sigma_cd*b*h**2) < 1e-4:
+            sol.append([M_i[i],k[i],_r[i]])
+    if sol == []:
+        return None
+    else:
+        return sol
 
 
 
@@ -295,11 +374,33 @@ def Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     M_cr = mu[-1]*sigma_cd*b*h**2
     return N_cr, M_cr
 
-fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b = Entrada_de_dados()
-m = 5
-l_e = 20*h
-e = h/3
-print(Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e))
+# fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b = Entrada_de_dados()
+# m = 5
+# l_e = 20*h
+# e = h/3
+# M_i,M_e,_r = Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e)
+# theta = h*1e3*_r
+
+# plt.figure(figsize=(8, 6))
+# plt.plot(theta, M_i/(sigma_cd*b*h**2), '-b', label='mu_int', linewidth=2)
+# plt.plot(theta, M_e/(sigma_cd*b*h**2), '-r', label='mu_ext', linewidth=2)
+# plt.xlabel('$ \\theta$', fontsize=12)
+# plt.ylabel('$ \\mu $', fontsize=12)
+# # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
+# # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
+# plt.title('Metodo do Pilar Padrao', fontsize=12)
+# plt.legend()
+# # plt.gca().set_aspect('equal', adjustable='box')
+# plt.grid(True)
+# plt.show()
+
+# sol = Pilar_padrao_sol(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e)
+# if sol != None:
+#     print('M (MNm) | k (m) | _r (m)')
+#     print('------------------------')
+#     for i in range(len(sol)):
+#         print('{:.4f} | {:.3f} | {:.4f}'.format(sol[i][0],sol[i][1],sol[i][2]))
+
 # print(Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e))
 # # Rompeu, e, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
 # # print(Rompeu, e, f)
