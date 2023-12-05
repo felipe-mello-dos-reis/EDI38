@@ -230,8 +230,8 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     M_i = [M_d]
     k = [k_i]
     _r = [k_i/1000]
-    M_e = [N_d*e + xi*k_i/1000]
-    while dM/(sigma_cd*b*h) > 1e-5:
+    M_e = [N_d*(e + xi*k_i/1000)]
+    while dM/(sigma_cd*b*h**2) > 1e-8:
         M_d = M_d + dM
         Rompeu, epsilon_0_i, k_i, _, _, _ = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k_i, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         if Rompeu == False:
@@ -239,7 +239,7 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
             M_i.append(M_d)
             k.append(k_i)
             _r.append(k_i/1000)
-            M_e.append(N_d*e + xi*k_i/1000)
+            M_e.append(N_d*(e + xi*k_i/1000))
         else:
             M_d = M_d - dM
             dM = dM/10
@@ -249,10 +249,10 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     _r = np.array(_r)
     k = np.array(k)
     plt.figure(figsize=(8, 6))
-    plt.plot(_r*1e2, M_i*1e5, '-b', label='M_int', linewidth=2)
-    plt.plot(_r*1e2, M_e*1e5, '-r', label='M_ext', linewidth=2)
-    plt.xlabel('$ \\frac{1}{r} (cm^{-1})$', fontsize=12)
-    plt.ylabel('$ M (KNcm)$', fontsize=12)
+    plt.plot(_r, M_i, '-b', label='M_int', linewidth=2)
+    plt.plot(_r, M_e, '-r', label='M_ext', linewidth=2)
+    plt.xlabel('$ \\frac{1}{r} (m^{-1})$', fontsize=12)
+    plt.ylabel('$ M (MN \\cdot m)$', fontsize=12)
     # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
     # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
     plt.title('Metodo do Pilar Padrao', fontsize=12)
@@ -295,12 +295,12 @@ def Normal_critica(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     M_cr = mu[-1]*sigma_cd*b*h**2
     return N_cr, M_cr
 
-# fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b = Entrada_de_dados()
-# m = 5
-# l_e = 20*h
-# e = h/3
+fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b = Entrada_de_dados()
+m = 5
+l_e = 20*h
+e = h/3
+print(Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e))
 # print(Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e))
-# print(Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e))
 # # Rompeu, e, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
 # # print(Rompeu, e, f)
 # i = 1
