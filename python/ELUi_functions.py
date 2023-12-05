@@ -117,6 +117,7 @@ def Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, 
     N_r_epsilon_c2 = nFNC_functions.Nc(epsilon_c2, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k) + nFNC_functions.Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_c2, k)
     epsilon_0_l = 0
     epsilon_0_r = epsilon_c2
+    EI_epsilon_0_i = 0
     i = 0
     while i < it_max and abs(epsilon_0_r-epsilon_0_l)/2 > 1e-9:
         EI_epislon_0_l = -(nFNC_functions.Jc(epsilon_t, epsilon_b, epsilon_0_l, epsilon_c2, sigma_cd, n, b, k, h, tol_k)[1][1] + nFNC_functions.Js(E_s, epsilon_yd, phi, y_s, nb, epsilon_0_l, k)[1][1])
@@ -141,7 +142,7 @@ def Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, 
     if i == it_max:
         N_cr = N_r_epsilon_c2
     else:
-        N_cr = np.pi**2*EI_epsilon_0_i/(l_e**2)*1e3
+        N_cr = (np.pi/l_e)**2*EI_epsilon_0_i*1e3
     return N_cr
         
 # def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e):
@@ -169,7 +170,7 @@ def Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, 
     plt.figure(figsize=(8, 6))
     plt.plot(e_values/h, N_cr_values*1000, '-r', linewidth=2)
     plt.xlabel('$e/h$', fontsize=12)
-    plt.ylabel('$N_cr \; (kN)$', fontsize=12)
+    plt.ylabel('$N_cr  (kN)$', fontsize=12)
     plt.xlim(min(e_values) * 1.1, max(e_values) * 1.1)
     plt.ylim(min(N_cr_values) * 1.1, max(N_cr_values) * 1.1)
     plt.title('Curve e/h versus N_cr', fontsize=12)
@@ -206,7 +207,7 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     plt.figure(figsize=(8, 6))
     plt.plot(nu, mu, '-b', linewidth=2)
     plt.xlabel('$ \\nu $', fontsize=12)
-    plt.ylabel('$ \mu $', fontsize=12)
+    plt.ylabel('$ \\mu $', fontsize=12)
     plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
     plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
     plt.title('Trajetoria de equilibrio', fontsize=12)
@@ -250,8 +251,8 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     plt.figure(figsize=(8, 6))
     plt.plot(_r*1e2, M_i*1e5, '-b', label='M_int', linewidth=2)
     plt.plot(_r*1e2, M_e*1e5, '-r', label='M_ext', linewidth=2)
-    plt.xlabel('$ \\frac{1}{r} \; (cm^{-1})$', fontsize=12)
-    plt.ylabel('$ M \; (KNcm)$', fontsize=12)
+    plt.xlabel('$ \\frac{1}{r} (cm^{-1})$', fontsize=12)
+    plt.ylabel('$ M (KNcm)$', fontsize=12)
     # plt.xlim(min(nu) * 1.1, max(nu) * 1.1)
     # plt.ylim(min(mu) * 1.1, max(mu) * 1.1)
     plt.title('Metodo do Pilar Padrao', fontsize=12)
