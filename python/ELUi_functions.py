@@ -193,7 +193,7 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     i = 0
     k_i = 0
     xi = (l_e/np.pi)**2
-    dM = sigma_cd*b*h**2/100
+    dM = sigma_cd*b*h**2/1e4
     N = [N_d]
     M_i = []
     epsilon_0 = []
@@ -222,8 +222,8 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     k = np.array(k)
     epsilon_0 = np.array(epsilon_0)
     plt.figure(figsize=(8, 6))
-    plt.plot(_r, M_i, '-b', label='M_int', linewidth=2)
-    plt.plot(_r, M_e, '-r', label='M_ext', linewidth=2)
+    plt.plot(_r, M_i, '-b', label='M_int', linewidth=1)
+    plt.plot(_r, M_e, '-r', label='M_ext', linewidth=1)
     plt.xlabel('$ \\frac{1}{r} (m^{-1})$', fontsize=12)
     plt.ylabel('$ M (MN \\cdot m)$', fontsize=12)
     plt.title('Metodo do Pilar Padrao', fontsize=12)

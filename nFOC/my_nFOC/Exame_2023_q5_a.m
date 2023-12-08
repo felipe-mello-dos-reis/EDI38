@@ -86,8 +86,8 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
 
-    Nd = 500;
-    Mdx = -1e6;
+    Nd = 1470;
+    Mdx = -6805000;
     Mdy = 0.0;  
 
     % Nd = 1000.0;
@@ -135,6 +135,6 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % NuMERO DE PASSOS PARA A CONSTRUÇÃO DA TRAJETÓRIA DE EQUILÍBRIO DO PILAR              
     %           500 
     
-    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_PRATICO'; % Altere para a análise desejada
+    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_CONTINUO'; % Altere para a análise desejada
     
     

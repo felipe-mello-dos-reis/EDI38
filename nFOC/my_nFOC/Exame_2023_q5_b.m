@@ -58,9 +58,33 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
     
     % Define the data
-    Xs = [9.0, 37.5, 66.0, 170.0, 202.0, 234.0, 266.0, 298.0, 330.0, 434.0, 462.5, 491.0, 9.0, 234.0, 266.0, 491.0, 9.0, 234.0, 266.0, 491.0];
-    Ys = [  9,    9,    9,     9,     9,     9,     9,     9,     9,     9,     9,     9,  32,    32,    32,    32,  55,    55,    55,    55];
+    % Xs = [9.0, 37.5, 66.0, 170.0, 202.0, 234.0, 266.0, 298.0, 330.0, 434.0, 462.5, 491.0, 9.0, 234.0, 266.0, 491.0, 9.0, 234.0, 266.0, 491.0, 23.25, 51.75, 80.25, 180.75, 137.25, 362.75, 391.25, 419.75, 448.25, 476.75];
+    % Ys = [  9,    9,    9,     9,     9,     9,     9,     9,     9,     9,     9,     9,  32,    32,    32,    32,  55,    55,    55,    55,     9,     9,     9,      9,      9,      9,      9,      9,      9,      9];
+    % Xs_extra = [94.5, 123, 151.5, 348.5, 377, 405.5, 37.5, 462.5, 250, 250, 250];
+    % Ys_extra = [   9,   9,     9,     9,   9,     9,   32,    32,   9,  32,  55];
+    
+    % Xs = [Xs,Xs_extra];
+    % Ys = [Ys,Ys_extra];
+    Xs_1 = linspace(10,490,25);
+    Ys_1 = 10*ones(size(Xs_1));
 
+    Xs_2 = linspace(10,490,25);
+    Ys_2 = 20*ones(size(Xs_2));
+
+    % Xs_3 = linspace(10,490,25);
+    % Ys_3 = 30*ones(size(Xs_3));
+
+    Xs_3 = [10, 30, 50, 230, 250, 270, 450, 470, 490];
+    Ys_3 = 30*ones(size(Xs_3));
+    
+    Xs_4 = [10, 30, 50, 230, 250, 270, 450, 470, 490];
+    Ys_4 = 40*ones(size(Xs_4));
+    
+    Xs_5 = [10, 30, 250, 470, 490];
+    Ys_5 = 50*ones(size(Xs_5));
+
+    Xs = [Xs_1,Xs_2,Xs_3, Xs_4, Xs_5];
+    Ys = [Ys_1,Ys_2,Ys_3, Ys_4, Ys_5];
 
     phi = 3.2;
     As = pi()*phi^2/4*ones(size(Xs));
@@ -78,7 +102,8 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
-    % E0         kx(1/cm)      ky(1/cm)      
+    % E0  
+    % Ys = [Ys,Ys_extra];       kx(1/cm)      ky(1/cm)      
     DEF(1) = -0.056840964291080;
     DEF(2) = 0.086502662181926;
     DEF(3) = 0.009355464738945;
@@ -86,8 +111,8 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
 
-    Nd = 500;
-    Mdx = -1e6;
+    Nd = 1470;
+    Mdx = -6805000;
     Mdy = 0.0;  
 
     % Nd = 1000.0;
@@ -135,6 +160,6 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % NuMERO DE PASSOS PARA A CONSTRUÇÃO DA TRAJETÓRIA DE EQUILÍBRIO DO PILAR              
     %           500 
     
-    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_PRATICO'; % Altere para a análise desejada
+    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_CONTINUO'; % Altere para a análise desejada
     
     

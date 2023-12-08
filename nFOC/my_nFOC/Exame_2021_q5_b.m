@@ -6,8 +6,8 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % PONTO     Xc(cm)     Yc(cm)
     
     % Define the data
-    Xc = [0, 500, 425, 300, 275, 275, 300, 425, 450, 450, 425, 500, 500, 600, 600, -100, -100,   0,  75, 200, 225, 225, 200, 75, 50,  50,  75,   0];
-    Yc = [0,   0,  30,  30,  55, 145, 170, 170, 145,  55,  30,   0, 170, 180, 200,  200,  180, 170, 170, 170, 145,  55,  30, 30, 55, 145, 170, 170];
+    Xc = [-15,15,15,7.5,7.5,15,15,-15,-15,-7.5,-7.5,-15];
+    Yc = [-40,-40,-30,-25,25,30,40,40,30,25,-25,-30];
     Xc(length(Xc) + 1) = Xc(1);
     Yc(length(Yc) + 1) = Yc(1);
 
@@ -32,7 +32,7 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     %% PROPRIEDADES DO CONCRETO     
     % Efeito Rüsch   fck (kN/cm2)        gamac    
     Rusch = 0.85;
-    fck = 9.0;
+    fck = 6.5;
     gamma_c = 1.4;
     SIGMAcd = Rusch*fck/gamma_c; %MPa
     
@@ -58,11 +58,10 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % BARRA    Xs(cm)    Ys(cm)     Asi(cm²)
     
     % Define the data
-    Xs = [9.0, 37.5, 66.0, 170.0, 202.0, 234.0, 266.0, 298.0, 330.0, 434.0, 462.5, 491.0, 9.0, 234.0, 266.0, 491.0, 9.0, 234.0, 266.0, 491.0];
-    Ys = [  9,    9,    9,     9,     9,     9,     9,     9,     9,     9,     9,     9,  32,    32,    32,    32,  55,    55,    55,    55];
+    Xs = [-12,0,12,-12,12,-12,12,-12,0,12];
+    Ys = [-37,-37,-37,-33,-33,33,33,37,37,37];
 
-
-    phi = 3.2;
+    phi = 2.5;
     As = pi()*phi^2/4*ones(size(Xs));
     Ns = length(Xs);
     
@@ -79,16 +78,19 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     
     %%  DEFORMAÇÃO PRESCRITA PARA A SEÇÃO (CÁLCULO DOS ESFORÇOS RESISTÊNTES)     
     % E0         kx(1/cm)      ky(1/cm)      
-    DEF(1) = -0.056840964291080;
-    DEF(2) = 0.086502662181926;
-    DEF(3) = 0.009355464738945;
+    DEF(1) = -0.30407777;
+    DEF(2) = 0.030407777;
+    DEF(3) = -0.12163111;
+    DEF(2) = Ecu/90;
+    DEF(1) = -10*DEF(2);
+    DEF(3) = -4*DEF(2)
     
     %% ESFORCOS DE CÁLCULO APLICADOS NA SEÇÃO (VERIFICAÇÃO DA SEÇÃO)    
     % Nd(kN)            Mdx(kN.cm)      Mdy(kN.cm)      
 
-    Nd = 500;
-    Mdx = -1e6;
-    Mdy = 0.0;  
+    Nd = 2000;
+    Mdx = -55000;
+    Mdy = 30000;  
 
     % Nd = 1000.0;
     % Mdx = -14000.0;
@@ -135,6 +137,6 @@ function [Xc, Yc, INC, SIGMAcd, Ec2, Ecu, n, Xs, Ys, As, Nc, Ns, classe_aco, fyk
     % NuMERO DE PASSOS PARA A CONSTRUÇÃO DA TRAJETÓRIA DE EQUILÍBRIO DO PILAR              
     %           500 
     
-    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_PRATICO'; % Altere para a análise desejada
+    OBJETIVO_DA_ANALISE = 'DIMENSIONAMENTO_CONTINUO'; % Altere para a análise desejada
     
     
