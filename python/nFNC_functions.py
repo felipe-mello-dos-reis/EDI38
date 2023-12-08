@@ -266,55 +266,59 @@ def ELU(epsilon_0, k, y_b, y_t, y_s, epsilon_c2, epsilon_cu):
     if (epsilon_max <= epsilon_cu) and (epsilon_s_min >= -10) and (epsilon_max - (epsilon_cu - epsilon_c2) * (epsilon_max - epsilon_min) / epsilon_cu <= epsilon_c2):
         # print("ELU ok!")
         return False
-		
+        
 def Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b):
-	## Newton-Raphson method
-	# Calculate N, M for first iteration
+    ## Newton-Raphson method
+    # Calculate N, M for first iteration   
+    epsilon_0 = 0
+    k = 0
+    epsilon_0_it = [epsilon_0]
+    k_it = [k]
 
-	N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
-	M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
+    N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
+    M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
 
-	N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
-	M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+    N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+    M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
 
-	N_r = N_c + N_s
-	M_r = M_c + M_s
-	i = 0
-	f_ad = np.sqrt(((N_d - N_r) / (sigma_cd * b * h))**2 + ((M_d - M_r) / (sigma_cd * b * h**2))**2)
+    N_r = N_c + N_s
+    M_r = M_c + M_s
+    i = 0
+    f_ad = np.sqrt(((N_d - N_r) / (sigma_cd * b * h))**2 + ((M_d - M_r) / (sigma_cd * b * h**2))**2)
 
-	while abs(f_ad) > tol_f and i < it_max:
-		i += 1
-		epsilon_t = epsilon_0 + k * y_t
-		epsilon_b = epsilon_0 + k * y_b
+    while abs(f_ad) > tol_f and i < it_max:
+        i += 1
+        epsilon_t = epsilon_0 + k * y_t
+        epsilon_b = epsilon_0 + k * y_b
 
-		N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
-		M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
+        N_s = Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
+        M_s = Ms(y_s, nb, phi, f_yd, epsilon_yd, epsilon_0, k)
 
-		N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
-		M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+        N_c = Nc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
+        M_c = Mc(epsilon_0, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k)
 
-		N_r = N_c + N_s
-		M_r = M_c + M_s
+        N_r = N_c + N_s
+        M_r = M_c + M_s
 
-		J_c = Jc(epsilon_t, epsilon_b, epsilon_0, epsilon_c2, sigma_cd, n, b, k, h, tol_k)
-		J_s = Js(E_s, epsilon_yd, phi, y_s, nb, epsilon_0, k)
-		J = J_c + J_s
+        J_c = Jc(epsilon_t, epsilon_b, epsilon_0, epsilon_c2, sigma_cd, n, b, k, h, tol_k)
+        J_s = Js(E_s, epsilon_yd, phi, y_s, nb, epsilon_0, k)
+        J = J_c + J_s
 
-		J_ad = J[0, 0] * J[1, 1] / (sigma_cd * b * h * sigma_cd * b * h * h**2) - J[0, 1] * J[1, 0] / ((sigma_cd * b * h**2)**2)
+        J_ad = J[0, 0] * J[1, 1] / (sigma_cd * b * h * sigma_cd * b * h * h**2) - J[0, 1] * J[1, 0] / ((sigma_cd * b * h**2)**2)
 
-		if abs(J_ad) > tol_J:
-			J_inv = 1 / (J[0, 0] * J[1, 1] - J[0, 1] * J[1, 0]) * np.array([[J[1, 1], -J[1, 0]], [-J[0, 1], J[0, 0]]])
-			f = np.array([[N_d - N_r], [M_d - M_r]])
-			new_it = np.array([[epsilon_0], [k]]) - np.dot(J_inv, f)
-			epsilon_0 = new_it[0, 0]
-			epsilon_0_it.append(epsilon_0)
-			k = new_it[1, 0]
-			k_it.append(k)
-			f_ad = np.sqrt(((N_d - N_r) / (sigma_cd * b * h))**2 + ((M_d - M_r) / (sigma_cd * b * h**2))**2)
-		else:
-			# print("No solution exists!")
-			return True, epsilon_0, k, epsilon_0_it, k_it, f_ad
+        if abs(J_ad) > tol_J:
+            J_inv = 1 / (J[0, 0] * J[1, 1] - J[0, 1] * J[1, 0]) * np.array([[J[1, 1], -J[1, 0]], [-J[0, 1], J[0, 0]]])
+            f = np.array([[N_d - N_r], [M_d - M_r]])
+            new_it = np.array([[epsilon_0], [k]]) - np.matmul(J_inv, f)
+            epsilon_0 = new_it[0, 0]
+            epsilon_0_it.append(epsilon_0)
+            k = new_it[1, 0]
+            k_it.append(k)
+            f_ad = np.sqrt(((N_d - N_r) / (sigma_cd * b * h))**2 + ((M_d - M_r) / (sigma_cd * b * h**2))**2)
+        else:
+            # print("No solution exists!")
+            return True, epsilon_0, k, epsilon_0_it, k_it, f_ad
 
-	return ELU(epsilon_0, k, y_b, y_t, y_s, epsilon_c2, epsilon_cu), epsilon_0, k, epsilon_0_it, k_it, f_ad
+    return ELU(epsilon_0, k, y_b, y_t, y_s, epsilon_c2, epsilon_cu), epsilon_0, k, epsilon_0_it, k_it, f_ad
 
 
