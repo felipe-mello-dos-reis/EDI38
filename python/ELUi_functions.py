@@ -15,13 +15,13 @@ def Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
     i=0
     N = F/(b*h)
     M = N*(e+f)
-    Rompeu, epsilon_0, k, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N, M, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+    Rompeu, epsilon_0_base, k_base, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N, M, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
     if Rompeu:
         # print('Failure due to lack of resistant capacity')
-        return True, e, f
+            return True, epsilon_0_base, k_base, f
     while (True):
         M_d = N_d*(e+f)
-        Rompeu, epsilon_0, k, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
+        Rompeu, epsilon_0_base, k_base, epsilon_0_it, k_it, f_ad = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         N = N_d*np.ones(m+1)
         y = np.zeros(m+1)
         M = np.zeros(m+1)
@@ -30,7 +30,7 @@ def Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
         for i in range(m+1):
             if (i == 0):
                 y[i] = 0
-                _r[i] = k/1000
+                _r[i] = k_base/1000
                 M[i] = N[i]*(e+f)
             elif (i == 1):
                 y[i] = _r[0]*dL**2/2
@@ -44,11 +44,11 @@ def Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd,
                 _r[i] = k/1000
             if Rompeu:
                 # print('Failure due to lack of resistant capacity')
-                return True, e, f
+                return True, epsilon_0_base, k_base, f
         
         if abs(y[-1] - f) <= tol_DF:
             # print('ELUi ok!')
-            return False, e, f
+            return False, epsilon_0_base, k_base, f
         else:
             f = y[-1]
             
@@ -112,6 +112,7 @@ def Curva_viga_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, 
             f = y[-1]
         
 def Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e):
+    k = 0
     N_r_epsilon_c2 = nFNC_functions.Nc(epsilon_c2, k, epsilon_c2, sigma_cd, n, y_b, y_t, b, h, tol_k) + nFNC_functions.Ns(y_s, nb, phi, f_yd, epsilon_yd, epsilon_c2, k)
     epsilon_0_l = 0
     epsilon_0_r = epsilon_c2
@@ -137,9 +138,11 @@ def Compressao_uniforme(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, 
             
     if i == it_max:
         N_cr = N_r_epsilon_c2
+        return N_cr, epsilon_c2, k
+
     else:
         N_cr = (np.pi/l_e)**2*EI_epsilon_0_i*1e3
-    return N_cr
+        return N_cr, epsilon_0_i, k
         
 def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, e):
     N_d = 0
@@ -149,14 +152,20 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     M_d = N_d*(e+f)
     N = [N_d]
     M = [M_d]
+    f_array = [f]
+    epsilon_0 = [0]
+    k = []
     while dN/(sigma_cd*b*h) > 1e-5:
         N_d = N_d + dN
         M_d = N_d*(e)
-        Rompeu, _, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
+        Rompeu, epsilon_0_base, k_base, f = Verificacao_DF(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e)
         F = 100*f/h
         if Rompeu == False:
             N.append(N_d)
             M.append(N_d*(e+f))
+            f_array.append(f)
+            epsilon_0.append(epsilon_0_base)
+            k.append(k_base)
         else:
             N_d = N_d - dN
             dN = dN/10
@@ -174,7 +183,10 @@ def Curva_de_projeto_ELUi(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s
     plt.show()
     N = np.array(N)
     M = np.array(M)
-    return N, M
+    f_array = np.array(f_array)
+    epsilon_0 = np.array(epsilon_0)
+    k = np.array(k)
+    return N, M, f_array, epsilon_0, k
 
 def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e):
     M_d = 0
@@ -184,9 +196,11 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     dM = sigma_cd*b*h**2/100
     N = [N_d]
     M_i = []
+    epsilon_0 = []
     k = []
     _r = []
     M_e = []
+    f = []
     while dM > sigma_cd*b*h**2/100*1e-9 and i < it_max:
         Rompeu, epsilon_0_i, k_i, _, _, _ = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d + dM, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k_i, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         if Rompeu == False:
@@ -194,15 +208,19 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
             N.append(N_d)
             M_i.append(M_d)
             k.append(k_i)
+            epsilon_0.append(epsilon_0_i)
             _r.append(k_i/1000)
             M_e.append(N_d*(e + xi*k_i/1000))
+            f.append(xi*k_i/1000)
         else:
             dM = dM/2
     N = np.array(N)
     M_i = np.array(M_i)
     M_e = np.array(M_e)
     _r = np.array(_r)
+    f = np.array(f)
     k = np.array(k)
+    epsilon_0 = np.array(epsilon_0)
     plt.figure(figsize=(8, 6))
     plt.plot(_r, M_i, '-b', label='M_int', linewidth=2)
     plt.plot(_r, M_e, '-r', label='M_ext', linewidth=2)
@@ -213,7 +231,7 @@ def Pilar_padrao_M_i(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     # plt.gca().set_aspect('equal', adjustable='box')
     plt.grid(True)
     plt.show()
-    return M_i, M_e, _r
+    return M_i, M_e, _r, f, epsilon_0, k
 
 def Pilar_padrao_sol(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k, epsilon_0_it, k_it, epsilon_t, epsilon_b, m, l_e, N_d, e):
     M_d = 0
@@ -223,9 +241,11 @@ def Pilar_padrao_sol(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
     dM = sigma_cd*b*h**2/1e4
     N = [N_d]
     M_i = []
+    epsilon_0 = []
     k = []
     _r = []
     M_e = []
+    f = []
     while dM > sigma_cd*b*h**2/100*1e-9 and i < it_max:
         Rompeu, epsilon_0_i, k_i, _, _, _ = nFNC_functions.Verificacao(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_yd, epsilon_yd, gamma_aco, c, b, h, d, nc, nb, phi, y_s, N_d, M_d + dM, epsilon_c2, epsilon_cu, x_lim, n, tol_J, tol_k, tol_f, i, it_max, y_t, y_b, epsilon_0, k_i, epsilon_0_it, k_it, epsilon_t, epsilon_b)
         if Rompeu == False:
@@ -233,19 +253,24 @@ def Pilar_padrao_sol(fck, gamma_c, sigma_cd, gamma_conc, f_yk, gamma_s, E_s, f_y
             N.append(N_d)
             M_i.append(M_d)
             k.append(k_i)
+            epsilon_0.append(epsilon_0_i)
             _r.append(k_i/1000)
             M_e.append(N_d*(e + xi*k_i/1000))
+            f.append(xi*k_i/1000)
         else:
             dM = dM/2
     N = np.array(N)
     M_i = np.array(M_i)
     M_e = np.array(M_e)
     _r = np.array(_r)
+    f = np.array(f)
     k = np.array(k)
+    epsilon_0 = np.array(epsilon_0)
     sol = []
     for i in range(len(M_i)):
         if abs(M_i[i]-M_e[i])/(sigma_cd*b*h**2) < 1e-4:
-            sol.append([M_i[i],k[i],_r[i]])
+            # sol.append([M_i[i],k[i],_r[i]])
+            sol.append([M_i[i], _r[i], f[i], epsilon_0[i], k[i]])
     if sol == []:
         return None
     else:
